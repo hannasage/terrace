@@ -7,6 +7,29 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-009 (2026-08-15): Ingest captures raw bytes, reconciliation lives in dbt
+
+**Decision.** An ingest adapter fetches its source and writes a dated, immutable
+snapshot, nothing more. Club-name and person-name resolution, and the
+fail-closed behaviour on an unrecognised name, happen in the dbt staging and
+core layers, not in the adapter.
+
+**Evidence.** SPEC.md 4.5 places reconciliation in the transformation path,
+reading the committed alias registry. Keeping the fetch dumb is what keeps it
+deterministic and cheap to reason about: the same URL on the same day yields the
+same snapshot, and a snapshot once written is never rewritten. Validating names
+at fetch time would couple the network step to the hand-maintained registry and
+duplicate logic that dbt already owns.
+
+**Supersedes.** The wording in BOOTSTRAP.md Phase 4, which asked ingest itself to
+fail closed on an unknown club name. The fail-closed guarantee is unchanged; it
+moves one layer inward, to where the alias registry is read.
+
+**Rules out.** Club or person validation, aliasing, or any registry read inside
+pipeline/ingest/. Adapters know sources, not clubs.
+
+---
+
 ## D-008 (2026-08-13): Automation metrics recorded per milestone
 
 **Decision.** Each milestone closes with four numbers recorded in this file:
