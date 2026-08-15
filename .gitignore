@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# dbt / DuckDB
+pipeline/dbt/target/
+pipeline/dbt/dbt_packages/
+pipeline/dbt/logs/
+*.duckdb
+*.duckdb.wal
+
+# Node / Next.js
+web/node_modules/
+web/.next/
+web/out/
+
+# Local environment
+.env
+.env.*
+
+# Local guardrail block log, read by scripts/collect_automation_metrics.py
+.claude/hooks/blocks.log
