@@ -22,13 +22,7 @@ build: ## Run dbt build, which runs every model and test
 check: ## Quality gates: guardrails over the diff, registry consistency, house style
 	uv run python scripts/guardrails_ci.py "$${BASE_SHA:-HEAD~1}"
 	uv run python scripts/check_registry.py
-	@echo "Checking for em-dashes and en-dashes"
-	@! grep -rInP '[\x{2014}\x{2013}]' \
-		--include='*.md' --include='*.py' --include='*.sql' \
-		--include='*.ts' --include='*.tsx' --include='*.yml' \
-		--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.venv . \
-		|| { echo "Em-dash or en-dash found. See CLAUDE.md conventions."; exit 1; }
-	@echo "house style clean"
+	uv run python scripts/house_style.py
 
 publish: ## Write Parquet artefacts to web/public/data
 	uv run python scripts/publish.py

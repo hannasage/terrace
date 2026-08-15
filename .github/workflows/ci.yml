@@ -24,29 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: No em-dashes or en-dashes
-        run: |
-          if grep -rInP '[\x{2014}\x{2013}]' \
-              --include='*.md' --include='*.py' --include='*.sql' \
-              --include='*.ts' --include='*.tsx' --include='*.yml' \
-              --exclude-dir=node_modules --exclude-dir=.git . ; then
-            echo "::error::Em-dash or en-dash found. See CLAUDE.md conventions."
-            exit 1
-          fi
-          echo "clean"
-
-      - name: Banned vocabulary
-        run: |
-          BANNED='delve|leverage|robust|pivotal|crucial|seamless|tapestry|testament|underscore|boasts|nuanced|multifaceted|landscape|realm|navigate|foster|garner|showcase|intricate|notably|moreover|furthermore|consequently'
-          # Scoped to prose and user-facing strings. Code may legitimately
-          # contain some of these words as identifiers.
-          if grep -rInE "\b($BANNED)\b" --include='*.md' \
-              --exclude-dir=node_modules --exclude-dir=.git \
-              . ; then
-            echo "::error::Banned vocabulary found. See FORMAT conventions in CLAUDE.md."
-            exit 1
-          fi
-          echo "clean"
+      # One canonical definition of the em-dash and banned-vocabulary rules,
+      # shared with the Makefile through scripts/house_style.py so local and CI
+      # agree. Stdlib only, so no environment setup is needed.
+      - name: House style
+        run: python3 scripts/house_style.py
 
   guardrails:
     name: guardrails
