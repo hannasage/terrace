@@ -19,24 +19,24 @@ marked **[CC]** are handed to Claude Code in a terminal session. Steps marked
 
 ## Phase 0: accounts and host
 
-- [ ] **[H]** Confirm Claude Max is active on the account that will run Claude
+- [X] **[H]** Confirm Claude Max is active on the account that will run Claude
       Code. Remote Control and Dispatch both require a claude.ai subscription
       and neither works with API key authentication.
-- [ ] **[H]** Order the Mac mini M4 Pro. Everything below works on the MacBook
+- [X] **[H]** Order the Mac mini M4 Pro. Everything below works on the MacBook
       until it arrives; nothing is blocked on the hardware.
-- [ ] **[H]** Decide the final project name. `terrace` is a placeholder and it
+- [X] **[H]** Decide the final project name. `terrace` is a placeholder and it
       appears in the repository name, the subdomain, and `SPEC.md`. Changing it
       later is cheap but tedious.
 
 ## Phase 1: repository skeleton
 
-- [ ] **[H]** Create the repository on GitHub. Private is fine and can open
+- [X] **[H]** Create the repository on GitHub. Private is fine and can open
       later. Do not initialise with a README, since the scaffold supplies one.
-- [ ] **[H]** Clone it locally and copy in the ten scaffold files: `SPEC.md`,
+- [X] **[H]** Clone it locally and copy in the ten scaffold files: `SPEC.md`,
       `CLAUDE.md`, `docs/`, `.claude/`, `.github/`, `scripts/`.
-- [ ] **[H]** Commit and push to `main` directly. This is the only direct push
+- [X] **[H]** Commit and push to `main` directly. This is the only direct push
       to `main` that will happen; after Phase 5 it is impossible.
-- [ ] **[H]** Run `claude` once in the project directory to accept the
+- [X] **[H]** Run `claude` once in the project directory to accept the
       workspace trust dialog. Remote Control will not start from an untrusted
       directory, and the dialog never saves trust for a home directory.
 
@@ -49,35 +49,35 @@ delegate, so it gets tested rather than assumed.
       payload shape and the blocking exit code match `read_payload` and
       `BLOCK_EXIT` in `.claude/hooks/guardrails.py`. Both are noted in the file
       as needing verification. If they have moved, fix them now.
-- [ ] **[CC]** "Verify the guardrail hook. For each check in
+- [X] **[CC]** "Verify the guardrail hook. For each check in
       `.claude/hooks/guardrails.py`, construct a payload that should be blocked
       and one that should pass, run them, and report a table of results. Do not
       modify the hook."
-- [ ] **[CC]** "Attempt to write a file at `web/app/api/players/route.ts`."
+- [X] **[CC]** "Attempt to write a file at `web/app/api/players/route.ts`."
       This should be blocked. If Claude Code succeeds, the hook is not wired.
 - [ ] **[H]** Confirm the hook is actually firing in session, not only when
       invoked by hand.
 
 ## Phase 3: build tooling, no checks yet
 
-- [ ] **[CC]** "Create the Python project: `pyproject.toml` with dbt-core,
+- [X] **[CC]** "Create the Python project: `pyproject.toml` with dbt-core,
       dbt-duckdb, duckdb, polars and pytest, managed by uv. Add a `Makefile`
       with the six targets named in `CLAUDE.md`. Do not implement ingest yet."
-- [ ] **[CC]** "Write `scripts/guardrails_ci.py`. It takes a base SHA, gets the
+- [X] **[CC]** "Write `scripts/guardrails_ci.py`. It takes a base SHA, gets the
       changed files, and runs the same checks as `.claude/hooks/guardrails.py`
       against their content. Share the check functions rather than duplicating
       them."
-- [ ] **[CC]** "Write `scripts/check_registry.py` and `scripts/publish.py`.
+- [X] **[CC]** "Write `scripts/check_registry.py` and `scripts/publish.py`.
       Both may be stubs that exit zero for now, with a TODO naming what they
       will assert."
-- [ ] **[CC]** "Scaffold the Next.js app in `web/` with
+- [X] **[CC]** "Scaffold the Next.js app in `web/` with
       `@hannasage/projection-ui` and its peer dependencies. A single page that
       renders one component from the package is enough. Add `typecheck`,
       `lint`, `build` and `audit:contrast` scripts. `audit:contrast` may be a
       stub."
-- [ ] Open a pull request for each of these. They will not have required checks
+- [ ] ~~Open a pull request for each of these. They will not have required checks
       yet, so merge them yourself. This is deliberate practice at the review
-      loop before it has teeth.
+      loop before it has teeth.~~
 
 ## Phase 4: make the checks real
 
@@ -103,13 +103,13 @@ delegate, so it gets tested rather than assumed.
 
 Only now, once every job in `ci.yml` has reported at least once.
 
-- [ ] **[H]** Repository Settings, General, Pull Requests: enable **Allow
+- [X] **[H]** Repository Settings, General, Pull Requests: enable **Allow
       auto-merge**. Without this the auto-merge button never appears and the
       data lane cannot work.
 - [ ] **[H]** Settings, Branches: protect `main`. Require a pull request before
       merging. Require status checks to pass. Select `house style`,
       `guardrails`, `pipeline` and `web` from the picker.
-- [ ] **[H]** Do **not** enable "Require approvals" globally. Approval comes
+- [X] **[H]** Do **not** enable "Require approvals" globally. Approval comes
       from `CODEOWNERS` per path, which is what allows a data-only pull request
       to merge unattended.
 - [ ] **[H]** Confirm `CODEOWNERS` resolves: open a test pull request touching

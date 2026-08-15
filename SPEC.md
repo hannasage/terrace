@@ -7,6 +7,7 @@ Status: draft v0.1, 13 Aug 2026. Not approved. Author: Hanna Sage.
 
 > Name is a placeholder. Change it here first, then everywhere else.
 
+
 ---
 
 ## 1. What this is
