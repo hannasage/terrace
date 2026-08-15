@@ -48,10 +48,14 @@ jobs:
         run: uv sync --frozen
 
       # Writes a dated, immutable snapshot per source. Never overwrites.
-      # Fails closed on an unregistered source or an unknown club name.
+      # Fails closed on an unregistered source. The run date is supplied here
+      # from the shell so the pipeline never reads the clock itself.
       - name: Ingest
         id: ingest
-        run: uv run python -m pipeline.ingest --sources "${{ inputs.sources || 'all' }}"
+        run: |
+          uv run python -m pipeline.ingest \
+            --sources "${{ inputs.sources || 'all' }}" \
+            --run-date "$(date -u +%Y-%m-%d)"
 
       - name: Detect changes
         id: diff
