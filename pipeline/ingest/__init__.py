@@ -2,10 +2,18 @@
 Deterministic source ingest for Terrace.
 
 One module per source under this package, each exposing a SOURCE_ID and a
-fetch(run_date, raw_root) that writes a dated, immutable snapshot beneath
-pipeline/data/raw/<source>/<run_date>/. An adapter never overwrites an existing
-snapshot and never mutates in place, so a snapshot is a permanent record of what
-a source held on a given day.
+fetch(run_date, raw_root, state) that captures a dated, immutable snapshot
+beneath pipeline/data/raw/<source>/<run_date>/, but only when the source has
+changed since the last one. An adapter never overwrites an existing snapshot and
+never mutates in place, so a snapshot is a permanent record of what a source held
+on a given day.
+
+Each source carries its own reference point in pipeline/data/state/<source>.json,
+loaded before the adapter runs and saved after, but only when something changed.
+That is what lets a refresh pull only what has moved: engsoccerdata compares an
+ETag, and a source that offers per-season or per-date access compares that
+instead. The runner does not know or care which; it just hands the adapter its
+last position and stores the new one.
 
 The run date is passed in, never read from the clock, so nothing here depends on
 wall-clock time. The network fetch lives here in the source layer, never in the
@@ -24,6 +32,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import engsoccerdata
+from . import state as source_state
 
 RAW_ROOT = Path(__file__).resolve().parents[2] / "pipeline" / "data" / "raw"
 
@@ -36,8 +45,10 @@ REGISTERED_SOURCES = {
     "clubelo",
 }
 
-# source id -> fetch function. Grows one entry per implemented adapter.
-ADAPTERS: dict[str, Callable[[str, Path], bool]] = {
+# source id -> fetch(run_date, raw_root, state) -> (changed, new_state).
+# Grows one entry per implemented adapter.
+Adapter = Callable[[str, Path, dict], "tuple[bool, dict]"]
+ADAPTERS: dict[str, Adapter] = {
     engsoccerdata.SOURCE_ID: engsoccerdata.fetch,
 }
 
@@ -81,9 +92,13 @@ def run(requested: str, run_date: str | None) -> int:
         if adapter is None:
             print(f"[{source}] no adapter implemented yet, skipping.")
             continue
-        if adapter(run_date, RAW_ROOT):
-            print(f"[{source}] wrote a new snapshot for {run_date}.")
+
+        previous = source_state.load_state(source, RAW_ROOT)
+        changed, new_state = adapter(run_date, RAW_ROOT, previous)
+        if changed:
+            source_state.save_state(source, RAW_ROOT, new_state)
+            print(f"[{source}] changed since last snapshot; captured {run_date}.")
             wrote += 1
         else:
-            print(f"[{source}] snapshot for {run_date} already present, skipping.")
+            print(f"[{source}] unchanged since last snapshot; nothing written.")
     return wrote

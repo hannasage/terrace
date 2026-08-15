@@ -7,6 +7,35 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-010 (2026-08-15): Ingest is change-gated, with per-source state
+
+**Decision.** Each source keeps a small state file at
+`pipeline/data/state/<source>.json` recording its last position: an ETag, a
+content hash, and the snapshot path. A refresh compares against that position and
+writes a new dated snapshot only when the source has changed. When it has not,
+nothing is downloaded, nothing is stored, and no pull request opens. Snapshots
+are stored gzip compressed.
+
+**Evidence.** Historic results do not change, so most refreshes have nothing new.
+Writing a full 15 MB snapshot on every run would grow the data lane without
+adding information. Verified 2026-08-15: `raw.githubusercontent.com` returns a
+content ETag and answers `If-None-Match` with a 304 and no body, so an unchanged
+engsoccerdata refresh transfers almost nothing. gzip takes the stored snapshot
+from roughly 15 MB to roughly 4 MB, and DuckDB reads it directly. The state file
+is a mutable pointer, distinct from the immutable snapshots it points at, and is
+committed so a fresh CI checkout resumes from the last known position.
+
+**Consequences.** The per-source state is the general mechanism; each adapter
+decides what "changed" means for its source. engsoccerdata compares an ETag on a
+monolithic file. football-data re-fetches only the current season. Understat
+never re-fetches a completed season. The runner stays ignorant of the strategy.
+
+**Rules out.** Re-storing an unchanged source, and any assumption that a snapshot
+exists for every scheduled run. A gap between snapshot dates means no change, not
+a missed run.
+
+---
+
 ## D-009 (2026-08-15): Ingest captures raw bytes, reconciliation lives in dbt
 
 **Decision.** An ingest adapter fetches its source and writes a dated, immutable
