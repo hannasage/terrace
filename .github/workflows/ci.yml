@@ -1,0 +1,123 @@
+name: ci
+
+# Every job here is a spec commitment made executable. Each one becomes a
+# required status check on main, which is what lets the data lane merge without
+# a human: the gates are trusted because they are the same gates either lane
+# has to pass.
+
+on:
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  house-style:
+    name: house style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No em-dashes or en-dashes
+        run: |
+          if grep -rInP '[\x{2014}\x{2013}]' \
+              --include='*.md' --include='*.py' --include='*.sql' \
+              --include='*.ts' --include='*.tsx' --include='*.yml' \
+              --exclude-dir=node_modules --exclude-dir=.git . ; then
+            echo "::error::Em-dash or en-dash found. See CLAUDE.md conventions."
+            exit 1
+          fi
+          echo "clean"
+
+      - name: Banned vocabulary
+        run: |
+          BANNED='delve|leverage|robust|pivotal|crucial|seamless|tapestry|testament|underscore|boasts|nuanced|multifaceted|landscape|realm|navigate|foster|garner|showcase|intricate|notably|moreover|furthermore|consequently'
+          # Scoped to prose and user-facing strings. Code may legitimately
+          # contain some of these words as identifiers.
+          if grep -rInE "\b($BANNED)\b" --include='*.md' \
+              --exclude-dir=node_modules --exclude-dir=.git \
+              . ; then
+            echo "::error::Banned vocabulary found. See FORMAT conventions in CLAUDE.md."
+            exit 1
+          fi
+          echo "clean"
+
+  guardrails:
+    name: guardrails
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The same constraints the local hook enforces, applied to the diff.
+      # A local hook only protects sessions that run the hook. This protects
+      # the branch.
+      - name: Run guardrails over changed files
+        run: python scripts/guardrails_ci.py "${{ github.event.pull_request.base.sha || 'HEAD~1' }}"
+
+  pipeline:
+    name: pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install
+        run: uv sync --frozen
+
+      # dbt build runs models and tests together. The five singular assertions
+      # in pipeline/dbt/tests/ are part of this and fail the job.
+      - name: dbt build
+        run: uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
+
+      - name: Registry consistency
+        run: uv run python scripts/check_registry.py
+
+      - name: Publish artefacts
+        run: uv run python scripts/publish.py --check
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+        working-directory: web
+
+      - run: npm run typecheck
+        working-directory: web
+
+      - run: npm run lint
+        working-directory: web
+
+      - run: npm run build
+        working-directory: web
+
+      # Contrast is computed from the token values in the built output, never
+      # eyeballed. 4.5:1 floor, 7.0:1 for body copy, both themes.
+      - name: WCAG contrast audit
+        run: npm run audit:contrast
+        working-directory: web

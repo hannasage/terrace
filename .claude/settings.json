@@ -1,0 +1,47 @@
+{
+  "$comment": [
+    "Verify this schema against the current Claude Code settings and hooks",
+    "reference before relying on it. The hook payload shape, the matcher",
+    "syntax and the blocking exit code are implementation details that move",
+    "between versions. The intent is stable: run .claude/hooks/guardrails.py",
+    "before any file write, and block the write on a non-zero exit."
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guardrails.py\""
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(dbt:*)",
+      "Bash(uv:*)",
+      "Bash(pytest:*)",
+      "Bash(npm run:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npm install:*)",
+      "Bash(uv add:*)",
+      "Bash(vercel:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  }
+}

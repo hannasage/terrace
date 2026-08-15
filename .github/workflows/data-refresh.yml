@@ -1,0 +1,102 @@
+name: data-refresh
+
+# The zero-touch lane. Fetches registered sources, rebuilds, and opens a pull
+# request that merges itself if every gate passes.
+#
+# Two design decisions worth understanding before editing:
+#
+# 1. The gates run on the pull request, not inside this job. A failed refresh
+#    still leaves a visible diff to look at, which is worth more than a red log.
+#
+# 2. The pull request is opened with AUTOMATION_TOKEN, not GITHUB_TOKEN. A pull
+#    request opened by GITHUB_TOKEN produces check runs in an approval-required
+#    state, so auto-merge would wait forever on checks that need a human to
+#    start them. That single detail would silently defeat the whole lane.
+
+on:
+  schedule:
+    # Tuesday and Friday at 09:00 UTC. Premier League matches settle by Monday
+    # night, and midweek fixtures by Thursday. Adjust when the calendar moves.
+    - cron: "0 9 * * 2,5"
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: "Comma-separated source ids, or 'all'"
+        required: false
+        default: "all"
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install
+        run: uv sync --frozen
+
+      # Writes a dated, immutable snapshot per source. Never overwrites.
+      # Fails closed on an unregistered source or an unknown club name.
+      - name: Ingest
+        id: ingest
+        run: uv run python -m pipeline.ingest --sources "${{ inputs.sources || 'all' }}"
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No source data changed. Nothing to do."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rebuild
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
+          uv run python scripts/publish.py
+
+      # Continues on failure deliberately. A build that breaks still produces a
+      # pull request, so the diff is reviewable from the GitHub app rather than
+      # buried in a log. CI on the pull request is what blocks the merge.
+        continue-on-error: true
+
+      - name: Open pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="data/$(date -u +%Y-%m-%d-%H%M)"
+          git config user.name "terrace-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "data: scheduled refresh $(date -u +%Y-%m-%d)"
+          git push origin "$BRANCH"
+
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "data: scheduled refresh $(date -u +%Y-%m-%d)" \
+            --body-file .github/pr-body-data.md \
+            --label data)
+
+          echo "Opened $PR_URL"
+
+          # Auto-merge waits for the required checks. Green merges with no
+          # human. Red leaves the pull request open and notifies.
+          gh pr merge --auto --squash "$PR_URL"

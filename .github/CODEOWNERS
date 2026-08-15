@@ -1,0 +1,42 @@
+# CODEOWNERS
+#
+# This file is the lane split. A pull request touching any path below requires
+# Hanna's approval. A pull request touching nothing below merges itself once
+# the required checks pass.
+#
+# That is why the data refresh is allowed to be unattended: it only writes raw
+# snapshots and published artefacts, neither of which is listed here. The
+# moment a refresh tries to change a model, a registry, or a source, it lands
+# in an owned path and stops for review.
+#
+# Do not add pipeline/data/ or web/public/data/ to this file. Doing so removes
+# the zero-touch data lane entirely.
+
+# Governing documents
+/SPEC.md                    @hannasage
+/CLAUDE.md                  @hannasage
+/README.md                  @hannasage
+/docs/                      @hannasage
+
+# Agent configuration and enforcement
+/.claude/                   @hannasage
+
+# Continuous integration and automation
+/.github/                   @hannasage
+/scripts/                   @hannasage
+
+# Data definitions. The transformations themselves, not their output.
+/pipeline/ingest/           @hannasage
+/pipeline/dbt/              @hannasage
+/pipeline/registry/         @hannasage
+
+# Application
+/web/                       @hannasage
+
+# Composite development. Reviewed by hand, always.
+/notebooks/                 @hannasage
+
+# Build configuration
+/Makefile                   @hannasage
+/pyproject.toml             @hannasage
+/package.json               @hannasage
