@@ -1,0 +1,12 @@
+# Committed alongside the project and loaded through --profiles-dir pipeline/dbt.
+# DuckDB is a local file, so there is no secret here. The database file is
+# gitignored. The build runs from the repository root in both CI and the
+# Makefile, so the path resolves the same way in each.
+
+terrace:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "pipeline/dbt/terrace.duckdb"
+      threads: 4
