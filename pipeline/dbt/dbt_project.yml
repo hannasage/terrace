@@ -1,0 +1,25 @@
+# Minimal buildable dbt project. Staging, core and marts models arrive in
+# BOOTSTRAP Phase 4. With no models yet, `dbt build` connects to DuckDB and
+# reports nothing to do, which is honest: there is no data to transform until
+# ingest lands. This exists so the required `pipeline` check has a project to
+# run against rather than failing on a missing dbt_project.yml.
+
+name: "terrace"
+version: "0.1.0"
+config-version: 2
+
+profile: "terrace"
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+# Per-layer model configuration (staging, core, marts schemas) lands with the
+# models themselves in Phase 4. Declaring it now would warn about config paths
+# that match no resources.
