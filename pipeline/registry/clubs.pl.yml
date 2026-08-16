@@ -1,0 +1,105 @@
+# clubs.yml, proposal from pipeline/data/raw/engsoccerdata/2026-08-15/england.csv
+# scope: pl. Review names and ids before pasting.
+# 51 clubs. Aliases belong in aliases.engsoccerdata.yml.
+- id: afc_bournemouth
+  name: AFC Bournemouth  # 4186 matches, 1923-2024, top tier 1
+- id: arsenal
+  name: Arsenal  # 4752 matches, 1893-2024, top tier 1
+- id: aston_villa
+  name: Aston Villa  # 4912 matches, 1888-2024, top tier 1
+- id: barnsley
+  name: Barnsley  # 4968 matches, 1898-2024, top tier 1
+- id: birmingham_city
+  name: Birmingham City  # 4994 matches, 1892-2024, top tier 1
+- id: blackburn_rovers
+  name: Blackburn Rovers  # 5040 matches, 1888-2024, top tier 1
+- id: blackpool
+  name: Blackpool  # 4921 matches, 1896-2024, top tier 1
+- id: bolton_wanderers
+  name: Bolton Wanderers  # 5062 matches, 1888-2024, top tier 1
+- id: bradford_city
+  name: Bradford City  # 4825 matches, 1903-2024, top tier 1
+- id: brentford
+  name: Brentford  # 4330 matches, 1920-2024, top tier 1
+- id: brighton_hove_albion
+  name: Brighton & Hove Albion  # 4254 matches, 1920-2024, top tier 1
+- id: burnley
+  name: Burnley  # 5102 matches, 1888-2024, top tier 1
+- id: cardiff_city
+  name: Cardiff City  # 4214 matches, 1920-2024, top tier 1
+- id: charlton_athletic
+  name: Charlton Athletic  # 4110 matches, 1921-2024, top tier 1
+- id: chelsea
+  name: Chelsea  # 4374 matches, 1905-2024, top tier 1
+- id: coventry_city
+  name: Coventry City  # 4206 matches, 1919-2024, top tier 1
+- id: crystal_palace
+  name: Crystal Palace  # 4156 matches, 1920-2024, top tier 1
+- id: derby_county
+  name: Derby County  # 5084 matches, 1888-2024, top tier 1
+- id: everton
+  name: Everton  # 4876 matches, 1888-2024, top tier 1
+- id: fulham
+  name: Fulham  # 4448 matches, 1907-2024, top tier 1
+- id: huddersfield_town
+  name: Huddersfield Town  # 4476 matches, 1910-2024, top tier 1
+- id: hull_city
+  name: Hull City  # 4665 matches, 1905-2024, top tier 1
+- id: ipswich_town
+  name: Ipswich Town  # 3442 matches, 1938-2024, top tier 1
+- id: leeds_united
+  name: Leeds United  # 4108 matches, 1920-2024, top tier 1
+- id: leicester_city
+  name: Leicester City  # 4868 matches, 1894-2024, top tier 1
+- id: liverpool
+  name: Liverpool  # 4752 matches, 1893-2024, top tier 1
+- id: luton_town
+  name: Luton Town  # 4076 matches, 1897-2024, top tier 1
+- id: manchester_city
+  name: Manchester City  # 4826 matches, 1892-2024, top tier 1
+- id: manchester_united
+  name: Manchester United  # 4784 matches, 1892-2024, top tier 1
+- id: middlesbrough
+  name: Middlesbrough  # 4730 matches, 1899-2024, top tier 1
+- id: newcastle_united
+  name: Newcastle United  # 4792 matches, 1893-2024, top tier 1
+- id: norwich_city
+  name: Norwich City  # 4160 matches, 1920-2024, top tier 1
+- id: nottingham_forest
+  name: Nottingham Forest  # 4984 matches, 1892-2024, top tier 1
+- id: oldham_athletic
+  name: Oldham Athletic  # 4545 matches, 1907-2021, top tier 1
+- id: portsmouth
+  name: Portsmouth  # 4181 matches, 1920-2024, top tier 1
+- id: queens_park_rangers
+  name: Queens Park Rangers  # 4204 matches, 1920-2024, top tier 1
+- id: reading
+  name: Reading  # 4340 matches, 1920-2024, top tier 1
+- id: sheffield_united
+  name: Sheffield United  # 5020 matches, 1892-2024, top tier 1
+- id: sheffield_wednesday
+  name: Sheffield Wednesday  # 5004 matches, 1892-2024, top tier 1
+- id: southampton
+  name: Southampton  # 4036 matches, 1920-2024, top tier 1
+- id: stoke_city
+  name: Stoke City  # 4784 matches, 1888-2024, top tier 1
+- id: sunderland
+  name: Sunderland  # 4964 matches, 1890-2024, top tier 1
+- id: swansea_city
+  name: Swansea City  # 4234 matches, 1920-2024, top tier 1
+- id: swindon_town
+  name: Swindon Town  # 4326 matches, 1920-2024, top tier 1
+- id: tottenham_hotspur
+  name: Tottenham Hotspur  # 4252 matches, 1908-2024, top tier 1
+- id: watford
+  name: Watford  # 4256 matches, 1920-2024, top tier 1
+- id: west_bromwich_albion
+  name: West Bromwich Albion  # 5048 matches, 1888-2024, top tier 1
+- id: west_ham_united
+  name: West Ham United  # 4030 matches, 1919-2024, top tier 1
+- id: wigan_athletic
+  name: Wigan Athletic  # 2044 matches, 1978-2024, top tier 1
+- id: wimbledon
+  name: Wimbledon  # 1144 matches, 1977-2003, top tier 1
+- id: wolverhampton_wanderers
+  name: Wolverhampton Wanderers  # 5082 matches, 1888-2024, top tier 1
