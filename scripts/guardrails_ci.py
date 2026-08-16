@@ -32,10 +32,16 @@ HOOK_DIR = REPO / ".claude" / "hooks"
 sys.path.insert(0, str(HOOK_DIR))
 import guardrails  # noqa: E402
 
-# The checks main() runs, in the same order the hook applies them.
+# The checks main() runs, in the same order the hook applies them, with one
+# deliberate exception. check_registry_not_edited is not run here. In a local
+# session it stops Claude from writing the hand-maintained registry. In CI it
+# cannot tell Claude's edit from Hanna's, so running it would block the one
+# person allowed to change those files from ever committing them. CODEOWNERS
+# already routes pipeline/registry/ to Hanna's approval, so a registry edit that
+# reaches a pull request is legitimate by construction. The local hook still
+# enforces the rule against Claude, where the concern lives. See D-011.
 CHECKS = (
     guardrails.check_no_em_dash,
-    guardrails.check_registry_not_edited,
     guardrails.check_source_allowlist,
     guardrails.check_pipeline_determinism,
     guardrails.check_no_export_route,

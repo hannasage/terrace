@@ -7,6 +7,26 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-011 (2026-08-15): The registry-edit guardrail runs in the session, not in CI
+
+**Decision.** `check_registry_not_edited` runs only in the local PreToolUse hook,
+which stops Claude from writing `clubs.yml`, `people.yml` and `aliases.*.yml`. It
+is removed from `scripts/guardrails_ci.py`, so the CI `guardrails` job no longer
+blocks a diff that touches those files.
+
+**Evidence.** The CI check cannot tell who authored an edit. Hanna is the sole
+editor of these files, so running the rule in CI blocked the one person allowed
+to change them: every registry edit failed the `guardrails` check and needed an
+admin override to merge. CODEOWNERS already routes `pipeline/registry/` to
+Hanna's approval, so a registry edit reaching a pull request is legitimate by
+construction. The local hook still enforces the rule against Claude, where the
+concern actually lives.
+
+**Rules out.** Relying on the branch check to keep Claude out of the registry.
+That guarantee comes from the session hook plus CODEOWNERS, not from CI.
+
+---
+
 ## D-010 (2026-08-15): Ingest is change-gated, with per-source state
 
 **Decision.** Each source keeps a small state file at
