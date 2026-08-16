@@ -1,6 +1,7 @@
-# clubs.yml, proposal from pipeline/data/raw/engsoccerdata/2026-08-15/england.csv
-# scope: pl. Review names and ids before pasting.
-# 51 clubs. Aliases belong in aliases.engsoccerdata.yml.
+# clubs.eng.yml: canonical English clubs, competition-agnostic ids.
+# Seeded from engsoccerdata, the 51 clubs that have appeared in the Premier
+# League (tier 1) since 1992/93. Expand as lower English tiers are modelled.
+# Aliases belong in aliases.<source>.yml. See docs/DECISIONS.md D-012.
 - id: afc_bournemouth
   name: AFC Bournemouth  # 4186 matches, 1923-2024, top tier 1
 - id: arsenal

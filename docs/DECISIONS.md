@@ -7,6 +7,31 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-012 (2026-08-16): Club and person registries are split by nation, not league
+
+**Decision.** The canonical club registry is per nation: `clubs.eng.yml` now,
+`clubs.<nation>.yml` as other countries are added, and the same shape for
+`people.<nation>.yml`. Not per league or per tier. The guardrail hook protects
+the `clubs.`, `people.` and `aliases.` prefixes so every per-nation file stays
+Hanna's.
+
+**Evidence.** A club moves between leagues within a nation through promotion and
+relegation, so a league cannot own a club's canonical id, which D-002 fixes as
+competition-agnostic. The 51 English clubs seeded from engsoccerdata have
+appeared in the Premier League, but most also spend seasons in lower tiers, and
+`england.csv` holds 147 English clubs across all four tiers. Clubs are disjoint
+across nations, so a per-nation file has no such overlap. Which competition a
+club played in is a fact in the data, captured in `club_season` and marts, not a
+property of the filename.
+
+**Supersedes.** The initial per-league naming `clubs.pl.yml`, which would have
+forced a relegated club to belong to two files at once.
+
+**Rules out.** Per-league or per-tier registry files, and any club appearing in
+more than one registry file within a nation.
+
+---
+
 ## D-011 (2026-08-15): The registry-edit guardrail runs in the session, not in CI
 
 **Decision.** `check_registry_not_edited` runs only in the local PreToolUse hook,

@@ -186,10 +186,15 @@ def check_pipeline_determinism(path, content):
 
 
 def check_registry_not_edited(path, _content):
-    """Hand-maintained registries are Hanna's, not Claude's."""
+    """Hand-maintained registries are Hanna's, not Claude's.
+
+    Matched by prefix so the per-nation naming is covered: clubs.yml,
+    clubs.eng.yml, people.eng.yml and every aliases.<source>.yml are all Hanna's.
+    See docs/DECISIONS.md D-012.
+    """
     protected = (
-        "pipeline/registry/clubs.yml",
-        "pipeline/registry/people.yml",
+        "pipeline/registry/clubs.",
+        "pipeline/registry/people.",
         "pipeline/registry/aliases.",
     )
     if any(path.startswith(p) for p in protected):
