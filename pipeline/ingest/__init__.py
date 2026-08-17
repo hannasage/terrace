@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import engsoccerdata
+from . import footballdata
 from . import state as source_state
 
 RAW_ROOT = Path(__file__).resolve().parents[2] / "pipeline" / "data" / "raw"
@@ -50,6 +51,7 @@ REGISTERED_SOURCES = {
 Adapter = Callable[[str, Path, dict], "tuple[bool, dict]"]
 ADAPTERS: dict[str, Adapter] = {
     engsoccerdata.SOURCE_ID: engsoccerdata.fetch,
+    footballdata.SOURCE_ID: footballdata.fetch,
 }
 
 _RUN_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
