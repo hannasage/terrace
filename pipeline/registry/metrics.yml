@@ -144,28 +144,100 @@
   higher_is_better: false    # 1 is champions
   precision: 0
 
+- id: goals_for_per_game
+  label: Goals for per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # goals_for / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_for_per_game.md
+  higher_is_better: true
+  precision: 2
+
+- id: goals_against_per_game
+  label: Goals against per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # goals_against / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_against_per_game.md
+  higher_is_better: false
+  precision: 2
+
+- id: goal_difference_per_game
+  label: Goal difference per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # goal_difference / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goal_difference_per_game.md
+  higher_is_better: true
+  precision: 2
+
+- id: points_share
+  label: Points share
+  grain: club_season
+  unit: ratio
+  kind: constructed          # points / (3 * matches_played), 0 to 1
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points_share.md
+  higher_is_better: true
+  precision: 3
+
+- id: is_champion
+  label: Champion
+  grain: club_season
+  unit: count                # a 0 or 1 flag; null while the season is in progress
+  kind: constructed          # league_position = 1 at season end
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/is_champion.md
+  higher_is_better: true
+  precision: 0
+
+- id: relegated
+  label: Relegated
+  grain: club_season
+  unit: count                # a 0 or 1 flag; null while the season is in progress
+  kind: constructed          # bottom three, or bottom four at the end of 1994/95
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/relegated.md
+  higher_is_better: false
+  precision: 0
+
+- id: points_change_vs_prev
+  label: Points change versus previous season
+  grain: club_season
+  unit: count
+  kind: constructed          # this season minus the immediately previous season
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points_change_vs_prev.md
+  higher_is_better: true
+  precision: 0
+
+- id: goal_difference_change_vs_prev
+  label: Goal difference change versus previous season
+  grain: club_season
+  unit: count
+  kind: constructed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goal_difference_change_vs_prev.md
+  higher_is_better: true
+  precision: 0
+
 # ---------------------------------------------------------------------------
-# Optional menu, still available. Uncomment the ones you want and I will wire
-# the mart column and definition doc.
+# Deferred: these need per-match rows, which the club-season mart does not hold.
+# They arrive with a match-grain mart in a follow-up. Uncommenting them now would
+# fail the build, since there is no column to map to yet.
 # ---------------------------------------------------------------------------
 
-# Rates:
-# - id: goals_for_per_game         # attacking output per match
-# - id: goals_against_per_game     # defensive leakiness per match
-# - id: goal_difference_per_game   # net dominance per match
-
-# Shares:
-# - id: points_share               # points / (3 * matches_played), share of the maximum possible
-
-# Standing (competition-specific PL rules):
-# - id: is_champion                # boolean, top of the table
-# - id: relegated                  # boolean, bottom three
-
-# Form and extremes (needs match-level ordering, a later match-grain mart):
 # - id: longest_win_streak         # most consecutive wins in the season
 # - id: biggest_win_margin         # largest goal margin in a single match
-# - id: clean_sheets               # matches with goals_against = 0 (needs match grain)
-
-# Cross-season movement (needs a self-join across seasons):
-# - id: points_change_vs_prev      # this season's points minus last season's
-# - id: goal_difference_change_vs_prev
+# - id: clean_sheets               # matches with goals_against = 0
