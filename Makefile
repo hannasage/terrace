@@ -16,7 +16,8 @@ help: ## List the available targets
 ingest: ## Fetch raw source data into pipeline/data/raw
 	uv run python -m pipeline.ingest --sources all
 
-build: ## Run dbt build, which runs every model and test
+build: ## Materialise the registry, then run dbt build (every model and test)
+	uv run python scripts/registry_to_parquet.py
 	uv run dbt build --project-dir $(DBT_DIR) --profiles-dir $(DBT_DIR)
 
 check: ## Quality gates: guardrails over the diff, registry consistency, house style

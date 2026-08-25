@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: mart__club_season
+    description: >
+      Premier League club-season standings quantities. One row per club per
+      season. Points use the three-for-a-win rule the Premier League has used
+      since 1992. Grain uniqueness is checked by
+      tests/assert_club_season_grain.sql.
+    columns:
+      - name: season_start_year
+        tests:
+          - not_null
+      - name: club_id
+        tests:
+          - not_null
+      - name: points
+        tests:
+          - not_null
+      - name: matches_played
+        tests:
+          - not_null
