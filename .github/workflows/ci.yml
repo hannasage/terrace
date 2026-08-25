@@ -78,6 +78,10 @@ jobs:
       - name: Publish artefacts
         run: uv run python scripts/publish.py --check
 
+      # The MCP tool logic, tested against the published artefacts.
+      - name: Tool tests
+        run: uv run pytest mcp_server -q
+
   web:
     name: web
     runs-on: ubuntu-latest
