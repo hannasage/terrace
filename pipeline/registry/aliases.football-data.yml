@@ -1,0 +1,107 @@
+# aliases.football-data.yml  (PROPOSAL for Hanna to review and commit)
+# Maps football-data.co.uk club names to canonical clubs.eng.yml ids.
+# Deterministic, hand-authored, no fuzzy matching (per D-005). 51 entries,
+# a clean bijection: every football-data PL name -> one canonical id.
+
+- source_name: Arsenal
+  club_id: arsenal
+- source_name: Aston Villa
+  club_id: aston_villa
+- source_name: Barnsley
+  club_id: barnsley
+- source_name: Birmingham
+  club_id: birmingham_city
+- source_name: Blackburn
+  club_id: blackburn_rovers
+- source_name: Blackpool
+  club_id: blackpool
+- source_name: Bolton
+  club_id: bolton_wanderers
+- source_name: Bournemouth
+  club_id: afc_bournemouth
+- source_name: Bradford
+  club_id: bradford_city
+- source_name: Brentford
+  club_id: brentford
+- source_name: Brighton
+  club_id: brighton_hove_albion
+- source_name: Burnley
+  club_id: burnley
+- source_name: Cardiff
+  club_id: cardiff_city
+- source_name: Charlton
+  club_id: charlton_athletic
+- source_name: Chelsea
+  club_id: chelsea
+- source_name: Coventry
+  club_id: coventry_city
+- source_name: Crystal Palace
+  club_id: crystal_palace
+- source_name: Derby
+  club_id: derby_county
+- source_name: Everton
+  club_id: everton
+- source_name: Fulham
+  club_id: fulham
+- source_name: Huddersfield
+  club_id: huddersfield_town
+- source_name: Hull
+  club_id: hull_city
+- source_name: Ipswich
+  club_id: ipswich_town
+- source_name: Leeds
+  club_id: leeds_united
+- source_name: Leicester
+  club_id: leicester_city
+- source_name: Liverpool
+  club_id: liverpool
+- source_name: Luton
+  club_id: luton_town
+- source_name: Man City
+  club_id: manchester_city
+- source_name: Man United
+  club_id: manchester_united
+- source_name: Middlesbrough
+  club_id: middlesbrough
+- source_name: Newcastle
+  club_id: newcastle_united
+- source_name: Norwich
+  club_id: norwich_city
+- source_name: "Nott'm Forest"
+  club_id: nottingham_forest
+- source_name: Oldham
+  club_id: oldham_athletic
+- source_name: Portsmouth
+  club_id: portsmouth
+- source_name: QPR
+  club_id: queens_park_rangers
+- source_name: Reading
+  club_id: reading
+- source_name: Sheffield United
+  club_id: sheffield_united
+- source_name: Sheffield Weds
+  club_id: sheffield_wednesday
+- source_name: Southampton
+  club_id: southampton
+- source_name: Stoke
+  club_id: stoke_city
+- source_name: Sunderland
+  club_id: sunderland
+- source_name: Swansea
+  club_id: swansea_city
+- source_name: Swindon
+  club_id: swindon_town
+- source_name: Tottenham
+  club_id: tottenham_hotspur
+- source_name: Watford
+  club_id: watford
+- source_name: West Brom
+  club_id: west_bromwich_albion
+- source_name: West Ham
+  club_id: west_ham_united
+- source_name: Wigan
+  club_id: wigan_athletic
+- source_name: Wimbledon
+  club_id: wimbledon
+- source_name: Wolves
+  club_id: wolverhampton_wanderers
