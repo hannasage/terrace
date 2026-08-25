@@ -1,0 +1,32 @@
+# Fly.io deployment for the Terrace MCP server.
+#
+# One small always-on machine serving the connector over HTTPS. Deploy from the
+# repository root so the Dockerfile's build context includes the bundled data:
+#
+#   fly deploy --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile
+#
+# Set the secrets first, never commit them:
+#
+#   fly secrets set TERRACE_MCP_TOKEN=<a long random string>
+#   fly secrets set TERRACE_PUBLIC_URL=https://<app-name>.fly.dev
+#
+# Then register https://<app-name>.fly.dev/mcp as a custom connector in Claude.
+
+app = "terrace-mcp"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Keep one machine running so the connector never hits a cold start. The load
+  # is a single personal user, so one small machine is plenty.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
