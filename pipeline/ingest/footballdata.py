@@ -48,6 +48,42 @@ REQUEST_GAP_SECONDS = 0.3
 MAX_ATTEMPTS = 3
 RETRY_BACKOFF_SECONDS = 2.0
 
+# The Premier League division code in the file's own Div column.
+PL_DIVISION = "E0"
+
+
+def _is_premier_league(body: bytes) -> bool:
+    """True if the fetched file is genuinely the Premier League division.
+
+    football-data serves the E0 URL for a season that has not started yet with a
+    placeholder from another division: verified 2026-08-16, the 2026/27 E0 URL
+    returned National League fixtures with Div 'EC' and non-league clubs. That
+    junk must not enter an immutable snapshot, so the adapter checks the file's
+    own Div column and skips anything that is not E0, treating it as not yet
+    available.
+
+    The leading UTF-8 byte-order mark some files carry is stripped at the byte
+    level so the first column name matches, then decoded as latin-1, which never
+    fails on a byte. This is a structural sanity check on the file the adapter
+    asked for, not name reconciliation, which stays in dbt per D-009.
+    """
+    if body.startswith(b"\xef\xbb\xbf"):
+        body = body[3:]
+    text = body.decode("latin-1", errors="replace")
+    lines = text.splitlines()
+    if len(lines) < 2:
+        return False
+    header = [c.strip() for c in lines[0].split(",")]
+    if "Div" not in header:
+        return False
+    div_index = header.index("Div")
+    for row in lines[1:]:
+        fields = row.split(",")
+        if len(fields) <= div_index or not fields[div_index].strip():
+            continue
+        return fields[div_index].strip() == PL_DIVISION
+    return False
+
 
 def _season_codes(run_date: str) -> list[str]:
     """Season codes from 1993/94 up to the season current on run_date.
@@ -117,10 +153,11 @@ def fetch(run_date: str, raw_root: Path, state: dict) -> tuple[bool, dict]:
     """Capture any season that changed. Returns (changed, new_state).
 
     Each changed season is written to
-    pipeline/data/raw/football-data/<run_date>/E0_<code>.csv.gz. A 404 on the
-    newest season is allowed, since a season that has not started yet has no
-    file; a 404 on any earlier season fails the run, because a completed season
-    must exist.
+    pipeline/data/raw/football-data/<run_date>/E0_<code>.csv.gz. Two ways the
+    newest season can legitimately be unavailable, both tolerated only for the
+    newest: a 404, and a placeholder from another division served before the
+    season starts. Either case on an earlier season fails the run, because a
+    completed season must exist and must be E0.
     """
     codes = _season_codes(run_date)
     if not codes:
@@ -147,6 +184,19 @@ def fetch(run_date: str, raw_root: Path, state: dict) -> tuple[bool, dict]:
             )
 
         body, etag = result
+
+        # football-data serves a placeholder from another division for a season
+        # that has not started. Skip it so junk never enters a snapshot; it is
+        # captured on a later run once the real E0 file is published. Only the
+        # newest season can legitimately be unpublished; an earlier season that
+        # is suddenly not E0 is wrong and fails the run.
+        if not _is_premier_league(body):
+            if code == newest:
+                continue
+            raise RuntimeError(
+                f"{SOURCE_ID}: season {code} is not the E0 division but should be."
+            )
+
         digest = hashlib.sha256(body).hexdigest()
         if digest == prior.get("content_sha256"):
             continue
