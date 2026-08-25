@@ -190,21 +190,32 @@ Run on every build, failing rather than warning:
 
 ## 5. Application
 
+Reframed by `docs/DECISIONS.md` D-013. The application is no longer a hosted web
+app with Explore, Compare, and Share screens. It is Claude's apps calling a local
+MCP tool layer. The surfaces below describe capabilities the tools and agents
+provide, not web pages. Ask, once a later phase, is now the primary paradigm.
+
 ### 5.1 Surfaces
 
-**Explore.** Browse competitions, seasons, clubs, players, matches. Each entity
-page is a set of registry-driven panels. No bespoke page logic per club.
+**Explore.** Ask about a competition, season, club, or match and get a
+registry-driven summary. The tools read the registry, so there is no bespoke
+logic per club.
 
-**Compare.** The core surface. Pick two or more entities of the same grain, pick
-metrics from the registry filtered to that grain, pick a season range, pick a
-chart form. Everything on this screen is generated from the registry.
+**Compare.** The core capability. Name two or more entities of the same grain, a
+metric from the registry, and a season range; a tool returns the aligned series
+and an agent renders the report. Filtered to the grain by the registry.
 
-**Share.** Any comparison serialises to a URL. Opening the URL rebuilds the
-exact view. The URL also drives a generated preview image for link unfurling.
+**Share.** A report is a Claude artefact or a saved file, not a public URL. No
+link unfurling, no preview image rendering (D-013 rules these out).
 
-**Ask.** Phase 2. Natural language in, comparison specification out. See 5.4.
+**Ask.** The primary paradigm now, not a later phase. Natural language in, a
+verified report out, via the agent team over the tools. See 5.4.
 
 ### 5.2 Stack
+
+Superseded in part by `docs/DECISIONS.md` D-013. The pipeline rows below are
+current. The interface is no longer a hosted web app: the front end, query, and
+hosting rows are replaced by a local MCP server and Claude's apps.
 
 | Layer | Choice |
 |---|---|
@@ -212,26 +223,24 @@ exact view. The URL also drives a generated preview image for link unfurling.
 | Storage | Parquet artefacts, DuckDB as the local engine |
 | Transform | dbt-core with dbt-duckdb, staging then core then marts |
 | Orchestration | GitHub Actions on a schedule |
-| Front end | Next.js App Router, `@hannasage/projection-ui`, recharts |
-| Query | DuckDB-WASM in a web worker, reading published Parquet |
-| Hosting | Vercel, unlisted subdomain of hannasage.love |
+| Tool layer | Local Python MCP server exposing deterministic query tools |
+| Interface | Claude Desktop and Claude Code, a team of agents producing reports |
 
-The query layer deserves a note because it carries the design. Published Parquet
-is served as static files and queried in the browser by DuckDB-WASM over HTTP
-range requests, so only the byte ranges a query needs are fetched. There is no
-backend, no database to run, no query endpoint to rate limit, and no server cost
-that scales with anything. The user composes SQL-backed comparisons against
-files on a CDN. For a dataset this size the whole published set is a few
-megabytes.
+The tool layer carries the design. Verified Parquet is written locally by the
+publish step and queried by a local MCP server using DuckDB. The server exposes
+registry-driven tools (list the metrics, list the clubs, get a metric, compare
+entities) that the Claude apps call. There is no backend to host, no query
+endpoint to secure, and no server cost. The model sits above the tools: it
+orchestrates and narrates, the tools compute, so run-time determinism holds.
 
 Two constraints that follow from that choice and must be respected:
 
-- The WASM bundle is large. It loads in a worker, lazily, after first paint, and
-  the interface must be usable while it initialises.
-- The published Parquet is readable by anyone who finds the URL. That is
-  acceptable for facts already public, and it is the reason principle 3 says
-  no *export route* rather than pretending the files are secret. Say so plainly
-  in the about page rather than implying otherwise.
+- The tools are registry-driven, never hardcoded. A metric appears to the agent
+  because it is in `metrics.yml`, not because a tool names it.
+- A tool returns a gap as an explicit gap and labels a constructed value as
+  constructed, so a report built from the tools cannot silently present an
+  absent or derived number as an observed one. This is principle 5 and 6 carried
+  into the tool layer.
 
 ### 5.3 Share links and previews
 
@@ -266,19 +275,24 @@ over a thing that must work without it.
 
 ## 6. Milestones
 
+Reframed by `docs/DECISIONS.md` D-013. M0 and M1 are unchanged. The interface
+milestones are now delivered through the MCP tools and Claude's apps, not web
+pages.
+
 | ID | Deliverable | Done when |
 |---|---|---|
 | M0 | Spine | Every Premier League season 1992/93 to present loaded, all quality gates green, two sources reconciled |
 | M1 | Registry and marts | Metric registry populated for team-level metrics, marts built, tier honesty enforced |
-| M2 | Explore | Club and season pages rendering from the registry |
-| M3 | Compare | User-composed comparisons across entities, metrics and seasons |
-| M4 | Share | URL round-trip and preview generation |
-| M5 | Players | Person grain loaded, reconciled, and exposed in Compare |
-| M6 | Ask | Natural language to comparison specification |
+| M2 | Tools | MCP server exposing registry-driven query tools over the published marts |
+| M3 | Reports | Agent-produced comparison reports across entities, metrics and seasons |
+| M4 | (dropped) | Share links and preview images removed by D-013 |
+| M5 | Players | Person grain loaded, reconciled, and exposed to the tools |
+| M6 | Ask | Natural language to a verified report, the primary paradigm |
 
-M0 through M2 are the portfolio-critical path. A finished pipeline with quality
-gates and a modest interface is stronger evidence than a rich interface over an
-unverified pipeline.
+M0 through M2 are the critical path: a verified pipeline with quality gates,
+reachable through a coded tool layer, is the foundation everything else builds
+on. A trustworthy tool over verified data beats a rich narration over an
+unverified one.
 
 ## 7. Success criteria
 

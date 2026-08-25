@@ -7,6 +7,43 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-013 (2026-08-25): The interface is Claude apps over local MCP tools, not a hosted site
+
+**Decision.** Terrace drops the hosted web product and delivers its interface
+through Claude's apps instead. The deterministic pipeline stays: ingest, dbt
+transforms, the quality gates, the registry, and the GitHub automation are all
+kept. On top of the verified data sits a local MCP server exposing deterministic
+query tools, and the user interface is Claude Desktop and Claude Code driving a
+team of agents that produce reports on demand. Natural language in, a verified
+report out. The model orchestrates and narrates; the coded tools compute.
+
+Four layers, each consuming the one below: ingest, transform, a local MCP tool
+layer, and a Claude-app UX. The model lives only in the top layer, so run-time
+determinism and fail-closed behaviour are unchanged: the tools return gaps as
+gaps and label constructed values, and the agents never invent a number.
+
+**Evidence.** Three reasons. Cost: the Claude Max subscription already held
+covers the usage, where hosting and API credits would not. UX: for a single
+personal user, Claude's apps are a better interface than a self-hosted site.
+Focus: the near-term goal is personal daily use, settling supporter arguments,
+for which a queryable tool the user already lives in beats a site to visit. The
+coded pipeline is what guarantees the reports are accurate and repeatable, so it
+is the half that stays; the web surface was the expensive half and the one being
+reconsidered.
+
+**Supersedes.** D-006's framing of the front end (DuckDB-WASM in the browser over
+static Parquet on a CDN) as the delivery mechanism. The no-backend,
+Parquet-plus-DuckDB data model is unchanged; only the client changes, from a
+browser app to a local MCP server the Claude apps call. Also supersedes the
+Next.js, Vercel, and share-link elements of the SPEC section 5 application design.
+
+**Rules out.** A hosted web application, a public URL, DuckDB-WASM in a browser,
+share links, and link-preview image rendering. The MCP tools return data to the
+user's own agent for personal use, which is consistent with D-003; they are not
+the public export or data service that operating principle 3 forbids.
+
+---
+
 ## D-012 (2026-08-16): Club and person registries are split by nation, not league
 
 **Decision.** The canonical club registry is per nation: `clubs.eng.yml` now,
