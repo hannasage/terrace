@@ -1,0 +1,9 @@
+{
+  "content_sha256": "4169e4ba8e4e828650c007ac19e0fd751acb098cea38d9be81dafdaf0a7fb1db",
+  "etag": "\"8bb9cd78a57d240e56985caa55881ba55ba328c16b7fc0b1b3c0166a19a3eef1\"",
+  "last_changed_run_date": "2026-08-25",
+  "snapshot": "engsoccerdata/2026-08-25/england.csv.gz",
+  "source": "engsoccerdata",
+  "uncompressed_bytes": 15398744,
+  "url": "https://raw.githubusercontent.com/jalapic/engsoccerdata/master/data-raw/england.csv"
+}

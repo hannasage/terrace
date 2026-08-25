@@ -1,0 +1,177 @@
+{
+  "last_changed_run_date": "2026-08-25",
+  "seasons": {
+    "0001": {
+      "content_sha256": "e2a73bae006d9724b5343d3735a61f11d258955477e3d87b68346d017edaf46b",
+      "etag": "\"f27c-42378f79aaf00\"",
+      "snapshot": "football-data/2026-08-25/E0_0001.csv.gz"
+    },
+    "0102": {
+      "content_sha256": "7a2e26a1a64de18d3b8fd47bca5329613db7b902ea19159817f8285859a1b981",
+      "etag": "\"102b6-42378f8610c40\"",
+      "snapshot": "football-data/2026-08-25/E0_0102.csv.gz"
+    },
+    "0203": {
+      "content_sha256": "32cb2daf8b3a121ad61601506e855a47f646df97252efed1ef83ffa1883c32a1",
+      "etag": "\"11a82-5985991d5e48e\"",
+      "snapshot": "football-data/2026-08-25/E0_0203.csv.gz"
+    },
+    "0304": {
+      "content_sha256": "29daeb6ded985034f4cce391e476cf2639e9cff78ad8bf9792794b06de346464",
+      "etag": "\"14dbe-42378f9a17b80\"",
+      "snapshot": "football-data/2026-08-25/E0_0304.csv.gz"
+    },
+    "0405": {
+      "content_sha256": "85241d09c572dfdf0f03817ceebd9a07d113fd45b7dead1ab6e5a329fd920b2c",
+      "etag": "\"14f86-42378fa589680\"",
+      "snapshot": "football-data/2026-08-25/E0_0405.csv.gz"
+    },
+    "0506": {
+      "content_sha256": "b497db70d969f2370f1b09d354ca23880e62f0e9b9a641b02591c40b22ab7971",
+      "etag": "\"18ef1-423db0c6b2100\"",
+      "snapshot": "football-data/2026-08-25/E0_0506.csv.gz"
+    },
+    "0607": {
+      "content_sha256": "947b2c56da7837ccd0d31fa65cf7bca7b78851ce32f7b820c98da0e9d8ee5ca8",
+      "etag": "\"18e9b-430604b4a5940\"",
+      "snapshot": "football-data/2026-08-25/E0_0607.csv.gz"
+    },
+    "0708": {
+      "content_sha256": "5945e40bef4334a98f73e71b2e3fa9d075c2c2205d96eb611a1ae8e98511d7f2",
+      "etag": "\"19cd3-452ec44ddf900\"",
+      "snapshot": "football-data/2026-08-25/E0_0708.csv.gz"
+    },
+    "0809": {
+      "content_sha256": "b78dcd1c522feafb44bcce1c459eb09911618460787cfe9ab478b2957c7ae294",
+      "etag": "\"19edd-4813e48d733a5\"",
+      "snapshot": "football-data/2026-08-25/E0_0809.csv.gz"
+    },
+    "0910": {
+      "content_sha256": "e8349af783aa262dddb1dbb84de088c15bf43e4fae85f6da4ec30a5c4d62c324",
+      "etag": "\"19d18-4862ed4faeba4\"",
+      "snapshot": "football-data/2026-08-25/E0_0910.csv.gz"
+    },
+    "1011": {
+      "content_sha256": "8f5d37651aca8498d8041088835e3a734b79e2fcc34f66ca8516c650970810ce",
+      "etag": "\"1a05a-4a3e3b00c5446\"",
+      "snapshot": "football-data/2026-08-25/E0_1011.csv.gz"
+    },
+    "1112": {
+      "content_sha256": "6cdb9963c311ca2e7d07eb429df721a2593cbd9c9fec55b9af82bca1a457b987",
+      "etag": "\"19f3f-4bff1b8ddcc98\"",
+      "snapshot": "football-data/2026-08-25/E0_1112.csv.gz"
+    },
+    "1213": {
+      "content_sha256": "1df561d34a9b79ff8cb1fccd4fd279d183e74cd871063a307ecf18f01e0d622f",
+      "etag": "\"1b9bd-5393c02f7bb86\"",
+      "snapshot": "football-data/2026-08-25/E0_1213.csv.gz"
+    },
+    "1314": {
+      "content_sha256": "3cf16078fde2e0e6c6cb07ebdb20ca98d1a755c9508a18bbeb4ad6837fad2b42",
+      "etag": "\"194da-5393c127b2eba\"",
+      "snapshot": "football-data/2026-08-25/E0_1314.csv.gz"
+    },
+    "1415": {
+      "content_sha256": "76b7858051ff6b17f46f49f26fdc70c1f29537270492606f5cc63d67fad5d149",
+      "etag": "\"18a23-5393c1c00aaf6\"",
+      "snapshot": "football-data/2026-08-25/E0_1415.csv.gz"
+    },
+    "1516": {
+      "content_sha256": "bd3502a18c38a1597fd9af62e2366b4015006d3528dd4d18b311bd6237bbc085",
+      "etag": "\"18930-5b9fdaae279d5\"",
+      "snapshot": "football-data/2026-08-25/E0_1516.csv.gz"
+    },
+    "1617": {
+      "content_sha256": "9625a7652b5f98fbd3e2e4d378c851fc246693f3343e34a72428d5b6e864d3e0",
+      "etag": "\"18696-55010e8ebd124\"",
+      "snapshot": "football-data/2026-08-25/E0_1617.csv.gz"
+    },
+    "1718": {
+      "content_sha256": "4f3389365ef3f7ac966764ed8ba67cf3b79f5aebed18dd224099c4b2c98bc67b",
+      "etag": "\"1897e-58b3635b1e0c1\"",
+      "snapshot": "football-data/2026-08-25/E0_1718.csv.gz"
+    },
+    "1819": {
+      "content_sha256": "7c096b3c2ecd54c6993d22eeea73450c2bde11e3457238b226b8f43c62dfc35e",
+      "etag": "\"17790-5a8a07f3dceb7\"",
+      "snapshot": "football-data/2026-08-25/E0_1819.csv.gz"
+    },
+    "1920": {
+      "content_sha256": "100037618b94f94057400bb02bf6bac4ef74ddaa58cde4b38370839c39caee61",
+      "etag": "\"2ad73-5ab606a296d05\"",
+      "snapshot": "football-data/2026-08-25/E0_1920.csv.gz"
+    },
+    "2021": {
+      "content_sha256": "5afe63f69401457b8354eaacee24f9a3e520b3c3af6329564a9783e20d789c62",
+      "etag": "\"2aec7-5c307aee8f4bd\"",
+      "snapshot": "football-data/2026-08-25/E0_2021.csv.gz"
+    },
+    "2122": {
+      "content_sha256": "335afcbabeb2939fa10ab39ba3e8215072d0b577cb8d0705c1e44c56e934e703",
+      "etag": "\"2ad03-64af2702ec913\"",
+      "snapshot": "football-data/2026-08-25/E0_2122.csv.gz"
+    },
+    "2223": {
+      "content_sha256": "8442792d3b614c94ea3cf381bd2736805889cc1713169035368fff19c3d02380",
+      "etag": "\"2b034-5feb511b5fe91\"",
+      "snapshot": "football-data/2026-08-25/E0_2223.csv.gz"
+    },
+    "2324": {
+      "content_sha256": "b2e057b0ed959f198b0f63d2391c01239f3608e6de5db68edab3f88e04d07ff3",
+      "etag": "\"2a0a4-618d602756e46\"",
+      "snapshot": "football-data/2026-08-25/E0_2324.csv.gz"
+    },
+    "2425": {
+      "content_sha256": "d0c8ce4a96d886cf60cf101f570f4a3893844226f91c7bd769eb568c49edbfa4",
+      "etag": "\"301f6-635fd86ddf171\"",
+      "snapshot": "football-data/2026-08-25/E0_2425.csv.gz"
+    },
+    "2526": {
+      "content_sha256": "3e3a8352f9ada6789c508d6ca184424421fed56a30400904a4a327c583407e62",
+      "etag": "\"31aae-652a8ffeb13c4\"",
+      "snapshot": "football-data/2026-08-25/E0_2526.csv.gz"
+    },
+    "2627": {
+      "content_sha256": "26e404d6184b16b84fc7dff45e9db4a7dae70bdefb05abd4cc92bd2fef211812",
+      "etag": "\"1591-659d26e85bd08\"",
+      "snapshot": "football-data/2026-08-25/E0_2627.csv.gz"
+    },
+    "9394": {
+      "content_sha256": "431f64f3272c82df9a25ba6abffc1c427b25947b6ff15c52b66ad77bb623c804",
+      "etag": "\"670e-3ec0299a5c680\"",
+      "snapshot": "football-data/2026-08-25/E0_9394.csv.gz"
+    },
+    "9495": {
+      "content_sha256": "1a13a383905b009aa0fac6cd4c92da914c7f0aac2b18f4a3c3574879b623b65d",
+      "etag": "\"6834-3ec029a8aa840\"",
+      "snapshot": "football-data/2026-08-25/E0_9495.csv.gz"
+    },
+    "9596": {
+      "content_sha256": "5fced3d4fdd55f2df953cfb55f45c3fc6a1a283a266f0be62b64016c85f631a8",
+      "etag": "\"5a50-423793cbee100\"",
+      "snapshot": "football-data/2026-08-25/E0_9596.csv.gz"
+    },
+    "9697": {
+      "content_sha256": "9819155cefcbe480fa5f65f64c197598b6975d40f7156a160fa08868c8156e7e",
+      "etag": "\"5b5a-423793d948080\"",
+      "snapshot": "football-data/2026-08-25/E0_9697.csv.gz"
+    },
+    "9798": {
+      "content_sha256": "edf7b268a490b1a5a5ae4d07d3ef4938d9ba2d85180f7efae0ae8f3646e55615",
+      "etag": "\"52a5-3ec029ee48c80\"",
+      "snapshot": "football-data/2026-08-25/E0_9798.csv.gz"
+    },
+    "9899": {
+      "content_sha256": "93461480fab8d180584d8b4be7edc58b6b4d861023b04af4a8f8614872aa5196",
+      "etag": "\"5389-423793e88a480\"",
+      "snapshot": "football-data/2026-08-25/E0_9899.csv.gz"
+    },
+    "9900": {
+      "content_sha256": "9e364370db2f58888f241af606f8075ad609a04b5526ddf2d79693c917e7f64c",
+      "etag": "\"5bd0-423793f11f8c0\"",
+      "snapshot": "football-data/2026-08-25/E0_9900.csv.gz"
+    }
+  },
+  "source": "football-data",
+  "url_template": "https://football-data.co.uk/mmz4281/{code}/E0.csv"
+}
