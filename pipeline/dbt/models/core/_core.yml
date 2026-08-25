@@ -1,11 +1,28 @@
 version: 2
 
 models:
+  - name: core__match_by_source
+    description: >
+      Every match from every source, resolved to canonical club ids, one row per
+      source per match. The not_null tests on the club ids are the fail-closed
+      reconciliation gate: an unresolved source name lands NULL and fails the
+      build.
+    columns:
+      - name: home_club_id
+        tests:
+          - not_null
+      - name: away_club_id
+        tests:
+          - not_null
+      - name: season_start_year
+        tests:
+          - not_null
+
   - name: core__match
     description: >
-      Conformed matches, competition-agnostic, both clubs resolved to canonical
-      ids. The not_null tests on the club ids are the fail-closed reconciliation
-      gate: an unresolved source name lands NULL and fails the build.
+      Conformed matches, one row per match, deduplicated across sources with
+      football-data primary from 1993/94 and engsoccerdata filling 1992/93.
+      Competition-agnostic.
     columns:
       - name: match_id
         tests:
@@ -18,8 +35,5 @@ models:
         tests:
           - not_null
       - name: season_start_year
-        tests:
-          - not_null
-      - name: match_date
         tests:
           - not_null
