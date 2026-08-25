@@ -48,7 +48,10 @@ ARTEFACTS = {
             m.goals_for,
             m.goals_against,
             m.goal_difference,
-            m.points
+            m.points,
+            m.points_per_game,
+            m.win_rate,
+            m.league_position
         from mart__club_season m
         join stg_registry__clubs c using (club_id)
         order by m.season_start_year, m.club_id

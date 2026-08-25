@@ -108,26 +108,58 @@
   precision: 0
 
 # ---------------------------------------------------------------------------
-# Optional menu. Uncomment the ones you want. Each needs a mart column and a
-# definition doc added (I will wire those when you pick). All are constructed
-# and computable from the columns we already have, so they are cheap to add.
+# Derived metrics, activated from the optional menu.
 # ---------------------------------------------------------------------------
 
-# Rates, which make seasons of different lengths comparable (42-match seasons
-# 1992-1994 vs 38-match seasons since, and the in-progress current season):
-# - id: points_per_game            # points / matches_played, the fairest cross-era ranking
+- id: points_per_game
+  label: Points per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # points / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points_per_game.md
+  higher_is_better: true
+  precision: 2
+
+- id: win_rate
+  label: Win rate
+  grain: club_season
+  unit: ratio
+  kind: constructed          # wins / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/win_rate.md
+  higher_is_better: true
+  precision: 3
+
+- id: league_position
+  label: League position
+  grain: club_season
+  unit: count
+  kind: constructed          # rank within the season on points, then GD, then GF
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/league_position.md
+  higher_is_better: false    # 1 is champions
+  precision: 0
+
+# ---------------------------------------------------------------------------
+# Optional menu, still available. Uncomment the ones you want and I will wire
+# the mart column and definition doc.
+# ---------------------------------------------------------------------------
+
+# Rates:
 # - id: goals_for_per_game         # attacking output per match
 # - id: goals_against_per_game     # defensive leakiness per match
 # - id: goal_difference_per_game   # net dominance per match
 
-# Ratios and shares (unit: ratio, 0 to 1):
-# - id: win_rate                   # wins / matches_played
+# Shares:
 # - id: points_share               # points / (3 * matches_played), share of the maximum possible
 
-# Finishing position and standing (needs a rank computed within each season):
-# - id: league_position            # 1 = champions; higher_is_better: false
+# Standing (competition-specific PL rules):
 # - id: is_champion                # boolean, top of the table
-# - id: relegated                  # boolean, bottom three (a PL rule, competition-specific)
+# - id: relegated                  # boolean, bottom three
 
 # Form and extremes (needs match-level ordering, a later match-grain mart):
 # - id: longest_win_streak         # most consecutive wins in the season
