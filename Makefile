@@ -25,7 +25,7 @@ check: ## Quality gates: guardrails over the diff, registry consistency, house s
 	uv run python scripts/check_registry.py
 	uv run python scripts/house_style.py
 
-publish: ## Write Parquet artefacts to web/public/data
+publish: ## Write verified Parquet artefacts to pipeline/data/published
 	uv run python scripts/publish.py
 
 dev: ## Run the web application locally

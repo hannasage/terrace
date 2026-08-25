@@ -1,0 +1,243 @@
+# metrics.yml
+#
+# Every number the tools can return is declared here once. The MCP tools read
+# this file, so a metric exists to the agent because it is listed here, never
+# because a tool names it. Adding a metric is a registry entry plus a mart column
+# plus a test, and nothing else.
+#
+# kind is observed or constructed. observed means a direct count or sum of values
+# a source publishes (goals in a match, a match outcome). constructed means a
+# value derived by a rule, which must be labelled as constructed everywhere it
+# appears and carry a definition link. The observed / constructed calls below are
+# a proposal; adjust them to taste before approving.
+#
+# grain club_season is one row per club per season. available_from is the
+# earliest season every input exists; results run from 1992/93, so all of these
+# start there. higher_is_better is null for a genuinely neutral metric.
+
+# ---------------------------------------------------------------------------
+# Active. These cover every column of mart__club_season.
+# ---------------------------------------------------------------------------
+
+- id: points
+  label: Points
+  grain: club_season
+  unit: count
+  kind: constructed          # 3 for a win, 1 for a draw: a competition rule
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points.md
+  higher_is_better: true
+  precision: 0
+
+- id: wins
+  label: Wins
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/wins.md
+  higher_is_better: true
+  precision: 0
+
+- id: draws
+  label: Draws
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/draws.md
+  higher_is_better: null
+  precision: 0
+
+- id: losses
+  label: Losses
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/losses.md
+  higher_is_better: false
+  precision: 0
+
+- id: goals_for
+  label: Goals for
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_for.md
+  higher_is_better: true
+  precision: 0
+
+- id: goals_against
+  label: Goals against
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_against.md
+  higher_is_better: false
+  precision: 0
+
+- id: goal_difference
+  label: Goal difference
+  grain: club_season
+  unit: count
+  kind: constructed          # goals_for minus goals_against
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goal_difference.md
+  higher_is_better: true
+  precision: 0
+
+- id: matches_played
+  label: Matches played
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/matches_played.md
+  higher_is_better: null
+  precision: 0
+
+# ---------------------------------------------------------------------------
+# Derived metrics, activated from the optional menu.
+# ---------------------------------------------------------------------------
+
+- id: points_per_game
+  label: Points per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # points / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points_per_game.md
+  higher_is_better: true
+  precision: 2
+
+- id: win_rate
+  label: Win rate
+  grain: club_season
+  unit: ratio
+  kind: constructed          # wins / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/win_rate.md
+  higher_is_better: true
+  precision: 3
+
+- id: league_position
+  label: League position
+  grain: club_season
+  unit: count
+  kind: constructed          # rank within the season on points, then GD, then GF
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/league_position.md
+  higher_is_better: false    # 1 is champions
+  precision: 0
+
+- id: goals_for_per_game
+  label: Goals for per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # goals_for / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_for_per_game.md
+  higher_is_better: true
+  precision: 2
+
+- id: goals_against_per_game
+  label: Goals against per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # goals_against / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_against_per_game.md
+  higher_is_better: false
+  precision: 2
+
+- id: goal_difference_per_game
+  label: Goal difference per game
+  grain: club_season
+  unit: per_match
+  kind: constructed          # goal_difference / matches_played
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goal_difference_per_game.md
+  higher_is_better: true
+  precision: 2
+
+- id: points_share
+  label: Points share
+  grain: club_season
+  unit: ratio
+  kind: constructed          # points / (3 * matches_played), 0 to 1
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points_share.md
+  higher_is_better: true
+  precision: 3
+
+- id: is_champion
+  label: Champion
+  grain: club_season
+  unit: count                # a 0 or 1 flag; null while the season is in progress
+  kind: constructed          # league_position = 1 at season end
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/is_champion.md
+  higher_is_better: true
+  precision: 0
+
+- id: relegated
+  label: Relegated
+  grain: club_season
+  unit: count                # a 0 or 1 flag; null while the season is in progress
+  kind: constructed          # bottom three, or bottom four at the end of 1994/95
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/relegated.md
+  higher_is_better: false
+  precision: 0
+
+- id: points_change_vs_prev
+  label: Points change versus previous season
+  grain: club_season
+  unit: count
+  kind: constructed          # this season minus the immediately previous season
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points_change_vs_prev.md
+  higher_is_better: true
+  precision: 0
+
+- id: goal_difference_change_vs_prev
+  label: Goal difference change versus previous season
+  grain: club_season
+  unit: count
+  kind: constructed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goal_difference_change_vs_prev.md
+  higher_is_better: true
+  precision: 0
+
+# ---------------------------------------------------------------------------
+# Deferred: these need per-match rows, which the club-season mart does not hold.
+# They arrive with a match-grain mart in a follow-up. Uncommenting them now would
+# fail the build, since there is no column to map to yet.
+# ---------------------------------------------------------------------------
+
+# - id: longest_win_streak         # most consecutive wins in the season
+# - id: biggest_win_margin         # largest goal margin in a single match
+# - id: clean_sheets               # matches with goals_against = 0
