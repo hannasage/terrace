@@ -1,38 +1,45 @@
--- Conformed matches, competition-agnostic. One row per match, with both clubs
--- resolved to canonical ids. This is the reconciliation point: a source club
--- name that does not resolve to a canonical id lands as NULL, and the not_null
--- test on home_club_id / away_club_id fails the build, which is the fail-closed
--- behaviour of SPEC 4.5 and D-009. engsoccerdata names already match the
--- registry, so nothing is NULL here today; football-data joins in later through
--- its alias file.
+-- Conformed matches, one row per match, deduplicated across sources.
 --
--- Nothing in this model names the Premier League or assumes a club count or a
--- season length. The competition is carried as an id from staging.
+-- Two sources cover overlapping matches. Per D-004, football-data is primary
+-- from 1993/94 and engsoccerdata is the spine and sole source for 1992/93 (and
+-- the cross-check everywhere else). So for each match, football-data wins when it
+-- has the match, and engsoccerdata fills the rest. The scores of the two sources
+-- are checked for agreement separately by assert_source_agreement; here we just
+-- pick the primary row.
+--
+-- The match key is competition, season, and the two club ids, not the date: the
+-- same fixture is one match even if the sources disagree on the exact day. Each
+-- ordered club pair meets once per season, so the key is unique.
 
-with matches as (
-    select * from {{ ref('stg_engsoccerdata__matches') }}
+with by_source as (
+    select * from {{ ref('core__match_by_source') }}
 ),
 
-clubs as (
-    select * from {{ ref('stg_registry__clubs') }}
+ranked as (
+    select
+        *,
+        row_number() over (
+            partition by competition_id, season_start_year, home_club_id, away_club_id
+            order by case source when 'football-data' then 0 else 1 end
+        ) as source_rank
+    from by_source
 )
 
 select
     md5(concat_ws(
         '|',
-        matches.competition_id,
-        cast(matches.season_start_year as varchar),
-        cast(matches.match_date as varchar),
-        home.club_id,
-        away.club_id
-    ))                                 as match_id,
-    matches.competition_id,
-    matches.season_start_year,
-    matches.match_date,
-    home.club_id                       as home_club_id,
-    away.club_id                       as away_club_id,
-    matches.home_goals,
-    matches.away_goals
-from matches
-left join clubs as home on matches.home_club_name = home.club_name
-left join clubs as away on matches.away_club_name = away.club_name
+        competition_id,
+        cast(season_start_year as varchar),
+        home_club_id,
+        away_club_id
+    ))                       as match_id,
+    competition_id,
+    season_start_year,
+    match_date,
+    home_club_id,
+    away_club_id,
+    home_goals,
+    away_goals,
+    source
+from ranked
+where source_rank = 1
