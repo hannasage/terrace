@@ -63,8 +63,12 @@ jobs:
       - name: Install
         run: uv sync --frozen
 
-      # dbt build runs models and tests together. The five singular assertions
-      # in pipeline/dbt/tests/ are part of this and fail the job.
+      # dbt reads the registry as Parquet, so materialise it from the YAML first.
+      - name: Materialise registry
+        run: uv run python scripts/registry_to_parquet.py
+
+      # dbt build runs models and tests together. The singular assertions in
+      # pipeline/dbt/tests/ are part of this and fail the job.
       - name: dbt build
         run: uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
 
