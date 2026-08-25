@@ -1,0 +1,139 @@
+# metrics.yml
+#
+# Every number the tools can return is declared here once. The MCP tools read
+# this file, so a metric exists to the agent because it is listed here, never
+# because a tool names it. Adding a metric is a registry entry plus a mart column
+# plus a test, and nothing else.
+#
+# kind is observed or constructed. observed means a direct count or sum of values
+# a source publishes (goals in a match, a match outcome). constructed means a
+# value derived by a rule, which must be labelled as constructed everywhere it
+# appears and carry a definition link. The observed / constructed calls below are
+# a proposal; adjust them to taste before approving.
+#
+# grain club_season is one row per club per season. available_from is the
+# earliest season every input exists; results run from 1992/93, so all of these
+# start there. higher_is_better is null for a genuinely neutral metric.
+
+# ---------------------------------------------------------------------------
+# Active. These cover every column of mart__club_season.
+# ---------------------------------------------------------------------------
+
+- id: points
+  label: Points
+  grain: club_season
+  unit: count
+  kind: constructed          # 3 for a win, 1 for a draw: a competition rule
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/points.md
+  higher_is_better: true
+  precision: 0
+
+- id: wins
+  label: Wins
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/wins.md
+  higher_is_better: true
+  precision: 0
+
+- id: draws
+  label: Draws
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/draws.md
+  higher_is_better: null
+  precision: 0
+
+- id: losses
+  label: Losses
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/losses.md
+  higher_is_better: false
+  precision: 0
+
+- id: goals_for
+  label: Goals for
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_for.md
+  higher_is_better: true
+  precision: 0
+
+- id: goals_against
+  label: Goals against
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goals_against.md
+  higher_is_better: false
+  precision: 0
+
+- id: goal_difference
+  label: Goal difference
+  grain: club_season
+  unit: count
+  kind: constructed          # goals_for minus goals_against
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/goal_difference.md
+  higher_is_better: true
+  precision: 0
+
+- id: matches_played
+  label: Matches played
+  grain: club_season
+  unit: count
+  kind: observed
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/matches_played.md
+  higher_is_better: null
+  precision: 0
+
+# ---------------------------------------------------------------------------
+# Optional menu. Uncomment the ones you want. Each needs a mart column and a
+# definition doc added (I will wire those when you pick). All are constructed
+# and computable from the columns we already have, so they are cheap to add.
+# ---------------------------------------------------------------------------
+
+# Rates, which make seasons of different lengths comparable (42-match seasons
+# 1992-1994 vs 38-match seasons since, and the in-progress current season):
+# - id: points_per_game            # points / matches_played, the fairest cross-era ranking
+# - id: goals_for_per_game         # attacking output per match
+# - id: goals_against_per_game     # defensive leakiness per match
+# - id: goal_difference_per_game   # net dominance per match
+
+# Ratios and shares (unit: ratio, 0 to 1):
+# - id: win_rate                   # wins / matches_played
+# - id: points_share               # points / (3 * matches_played), share of the maximum possible
+
+# Finishing position and standing (needs a rank computed within each season):
+# - id: league_position            # 1 = champions; higher_is_better: false
+# - id: is_champion                # boolean, top of the table
+# - id: relegated                  # boolean, bottom three (a PL rule, competition-specific)
+
+# Form and extremes (needs match-level ordering, a later match-grain mart):
+# - id: longest_win_streak         # most consecutive wins in the season
+# - id: biggest_win_margin         # largest goal margin in a single match
+# - id: clean_sheets               # matches with goals_against = 0 (needs match grain)
+
+# Cross-season movement (needs a self-join across seasons):
+# - id: points_change_vs_prev      # this season's points minus last season's
+# - id: goal_difference_change_vs_prev
