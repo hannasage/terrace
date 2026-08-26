@@ -7,6 +7,37 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-015 (2026-08-26): The hosted MCP is a public server gated by an unguessable path
+
+**Decision.** The hosted MCP server advertises no OAuth and is reached as a public
+custom connector. The gate is the URL path: the server mounts at `/<secret>/mcp`,
+where the secret is `TERRACE_MCP_TOKEN`, so the address is unguessable. There is
+no bearer-token check on requests.
+
+**Evidence.** D-014 assumed a bearer token would gate the endpoint. Claude's
+custom-connector flow does not support that: it always attempts OAuth dynamic
+client registration, and a server that advertises OAuth without fully implementing
+an authorization server fails with "couldn't register with the sign-in service",
+which is exactly what happened. Anthropic's own guidance is that a server which
+advertises no OAuth (its `.well-known` endpoints return 404) is connected as a
+public server. So the realistic choices are a full OAuth authorization server,
+which is heavy for a single personal user, or a public server. A public server
+gated by a secret path is chosen: it is the same strength as a bearer token
+carried in the URL, and the exposure is read-only tools over already-public
+Premier League facts, so the stakes are low. The SDK bug where the auth code also
+prevented the container from binding its port is removed by dropping the auth
+path entirely.
+
+**Supersedes.** The bearer-token mechanism of D-014. D-014's intent holds: the
+endpoint is private in practice (unguessable, unadvertised, personal) and exposes
+only the read-only query tools. Removes `mcp_server/auth.py` and its test.
+
+**Rules out.** A bearer-token check against Claude's connector, since the platform
+does not send one. Full OAuth stays available in the SDK if a future need or a
+non-public data source ever justifies it.
+
+---
+
 ## D-014 (2026-08-25): A private, authenticated remote MCP endpoint for multi-device access
 
 **Decision.** The Terrace MCP server is additionally hosted as a small public

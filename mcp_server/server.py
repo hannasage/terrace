@@ -19,35 +19,29 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from mcp.server.auth.settings import AuthSettings  # noqa: E402
 from mcp.server.mcpserver import MCPServer  # noqa: E402
 
 import terrace_tools as tools  # noqa: E402
-from auth import StaticTokenVerifier  # noqa: E402
 
 # Transport is stdio by default, which is what Claude Desktop and Claude Code
-# launch as a private subprocess, no auth needed. Set TERRACE_TRANSPORT to
-# streamable-http to serve a public HTTPS endpoint for a custom connector, which
-# requires a bearer secret and the server's own public URL.
+# launch as a private subprocess. Set TERRACE_TRANSPORT to streamable-http to
+# serve a public HTTPS endpoint for a custom connector.
+#
+# Claude's custom-connector flow supports only OAuth or a plain public server; it
+# has no bearer-token option, and attempting OAuth against a server that does not
+# fully implement it fails to register. So the hosted server advertises no OAuth
+# and is reached as a public connector. The gate is the path: the server mounts at
+# /<secret>/mcp, built from TERRACE_MCP_TOKEN, so the URL is unguessable. That is
+# obscurity, not cryptographic auth, which is acceptable here because the tools
+# are read-only over already-public Premier League facts. See D-015.
 TRANSPORT = os.environ.get("TERRACE_TRANSPORT", "stdio")
 HTTP_HOST = os.environ.get("TERRACE_HTTP_HOST", "0.0.0.0")
 HTTP_PORT = int(os.environ.get("TERRACE_HTTP_PORT", "8000"))
 
-if TRANSPORT == "streamable-http":
-    public_url = os.environ.get(
-        "TERRACE_PUBLIC_URL", f"http://localhost:{HTTP_PORT}"
-    )
-    server = MCPServer(
-        "terrace",
-        auth=AuthSettings(
-            issuer_url=public_url,
-            resource_server_url=public_url,
-            required_scopes=["terrace:read"],
-        ),
-        token_verifier=StaticTokenVerifier(os.environ.get("TERRACE_MCP_TOKEN", "")),
-    )
-else:
-    server = MCPServer("terrace")
+_secret = os.environ.get("TERRACE_MCP_TOKEN", "").strip("/")
+HTTP_PATH = f"/{_secret}/mcp" if _secret else "/mcp"
+
+server = MCPServer("terrace")
 
 
 @server.tool()
@@ -105,6 +99,11 @@ def compare(
 
 if __name__ == "__main__":
     if TRANSPORT == "streamable-http":
-        server.run(transport="streamable-http", host=HTTP_HOST, port=HTTP_PORT)
+        server.run(
+            transport="streamable-http",
+            host=HTTP_HOST,
+            port=HTTP_PORT,
+            streamable_http_path=HTTP_PATH,
+        )
     else:
         server.run(transport="stdio")
