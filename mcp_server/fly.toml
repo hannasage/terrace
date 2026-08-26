@@ -15,6 +15,12 @@
 app = "terrace-mcp"
 primary_region = "iad"
 
+# The reading level for this server's one reader. Pinning it stops the agent
+# asking at the start of every conversation. Remove it to have the question asked
+# once per chat instead. Not a secret, so it lives here rather than in secrets.
+[env]
+  TERRACE_DEFAULT_MODE = "analytics"
+
 [build]
   dockerfile = "Dockerfile"
 

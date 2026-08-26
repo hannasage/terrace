@@ -1,0 +1,879 @@
+{
+  "source": {
+    "repository": "hannasage/resume",
+    "path": "app/lib/projection-themes.ts",
+    "commit": "0ddb7b8270d5a5ace0ffebca09e79cb039fc0fbc"
+  },
+  "default_dark": "projection",
+  "default_light": "coastal-day",
+  "themes": [
+    {
+      "id": "projection",
+      "name": "Projection",
+      "isDark": true,
+      "colors": {
+        "bg": "#07090C",
+        "surface": "#0D1117",
+        "faint": "#0A0E14",
+        "border": "#1B2535",
+        "text": "#DDE3EE",
+        "muted": "#8396AB",
+        "accent": "#C9F53A",
+        "dim": "#8CB025",
+        "blue": "#5B9CF6",
+        "orange": "#F97316",
+        "red": "#F87171",
+        "purple": "#C084FC",
+        "textOnAccent": "#07090C"
+      },
+      "planColors": [
+        {
+          "label": "Chartreuse",
+          "value": "#C9F53A"
+        },
+        {
+          "label": "Sky",
+          "value": "#5B9CF6"
+        },
+        {
+          "label": "Tangerine",
+          "value": "#F97316"
+        },
+        {
+          "label": "Lavender",
+          "value": "#C084FC"
+        },
+        {
+          "label": "Coral",
+          "value": "#F87171"
+        },
+        {
+          "label": "Mint",
+          "value": "#34D399"
+        },
+        {
+          "label": "Gold",
+          "value": "#FBBF24"
+        },
+        {
+          "label": "Rose",
+          "value": "#FB7185"
+        },
+        {
+          "label": "Cyan",
+          "value": "#22D3EE"
+        },
+        {
+          "label": "Slate",
+          "value": "#94A3B8"
+        }
+      ]
+    },
+    {
+      "id": "midnight-reef",
+      "name": "Midnight Reef",
+      "isDark": true,
+      "colors": {
+        "bg": "#021721",
+        "surface": "#062535",
+        "faint": "#041d2a",
+        "border": "#0e3c52",
+        "text": "#e2f2fa",
+        "muted": "#7abcd4",
+        "accent": "#ffb703",
+        "dim": "#cc9800",
+        "blue": "#219ebc",
+        "orange": "#fb8500",
+        "red": "#ff6b6c",
+        "purple": "#a480cf",
+        "textOnAccent": "#021721"
+      },
+      "planColors": [
+        {
+          "label": "Gold",
+          "value": "#ffb703"
+        },
+        {
+          "label": "Reef",
+          "value": "#8ecae6"
+        },
+        {
+          "label": "Tangerine",
+          "value": "#fb8500"
+        },
+        {
+          "label": "Mauve",
+          "value": "#a480cf"
+        },
+        {
+          "label": "Coral",
+          "value": "#ff6b6c"
+        },
+        {
+          "label": "Seafoam",
+          "value": "#34d399"
+        },
+        {
+          "label": "Honey",
+          "value": "#fcd34d"
+        },
+        {
+          "label": "Blossom",
+          "value": "#ffc8dd"
+        },
+        {
+          "label": "Teal",
+          "value": "#219ebc"
+        },
+        {
+          "label": "Fog",
+          "value": "#b8b8d1"
+        }
+      ]
+    },
+    {
+      "id": "neon-arcade",
+      "name": "Neon Arcade",
+      "isDark": true,
+      "colors": {
+        "bg": "#0f0f23",
+        "surface": "#16162f",
+        "faint": "#121227",
+        "border": "#2c2c58",
+        "text": "#f4f4ff",
+        "muted": "#9aa1d8",
+        "accent": "#00f5d4",
+        "dim": "#00c2a7",
+        "blue": "#4cc9f0",
+        "orange": "#ff9e00",
+        "red": "#ff4d6d",
+        "purple": "#b5179e",
+        "textOnAccent": "#09091a"
+      },
+      "planColors": [
+        {
+          "label": "Zap",
+          "value": "#ffbe0b"
+        },
+        {
+          "label": "Volt",
+          "value": "#3a86ff"
+        },
+        {
+          "label": "Blaze",
+          "value": "#fb5607"
+        },
+        {
+          "label": "Pulse",
+          "value": "#8338ec"
+        },
+        {
+          "label": "Magma",
+          "value": "#ff006e"
+        },
+        {
+          "label": "Glow",
+          "value": "#06d6a0"
+        },
+        {
+          "label": "Flash",
+          "value": "#ffd166"
+        },
+        {
+          "label": "Fizz",
+          "value": "#ff9ec8"
+        },
+        {
+          "label": "Neon",
+          "value": "#00e5ff"
+        },
+        {
+          "label": "Static",
+          "value": "#a0a8cc"
+        }
+      ]
+    },
+    {
+      "id": "deep-forest",
+      "name": "Deep Forest",
+      "isDark": true,
+      "colors": {
+        "bg": "#0d1612",
+        "surface": "#13211a",
+        "faint": "#101c16",
+        "border": "#264133",
+        "text": "#e8f6ee",
+        "muted": "#8ab89c",
+        "accent": "#80ed99",
+        "dim": "#57cc99",
+        "blue": "#4ea8de",
+        "orange": "#e9a03b",
+        "red": "#ef476f",
+        "purple": "#b388eb",
+        "textOnAccent": "#0b1a0d"
+      },
+      "planColors": [
+        {
+          "label": "Lime",
+          "value": "#a7c957"
+        },
+        {
+          "label": "Sky",
+          "value": "#5b9cf6"
+        },
+        {
+          "label": "Rust",
+          "value": "#fb8500"
+        },
+        {
+          "label": "Violet",
+          "value": "#c084fc"
+        },
+        {
+          "label": "Berry",
+          "value": "#bc4749"
+        },
+        {
+          "label": "Fern",
+          "value": "#6a994e"
+        },
+        {
+          "label": "Honey",
+          "value": "#fbbf24"
+        },
+        {
+          "label": "Bloom",
+          "value": "#fb7185"
+        },
+        {
+          "label": "Spring",
+          "value": "#22d3ee"
+        },
+        {
+          "label": "Stone",
+          "value": "#94a3b8"
+        }
+      ]
+    },
+    {
+      "id": "ember-tide",
+      "name": "Ember Tide",
+      "isDark": true,
+      "colors": {
+        "bg": "#14111a",
+        "surface": "#1f1a29",
+        "faint": "#1a1623",
+        "border": "#3a2f4d",
+        "text": "#f8f1ff",
+        "muted": "#b4a7c7",
+        "accent": "#ff9f1c",
+        "dim": "#d67f00",
+        "blue": "#5e81f4",
+        "orange": "#ff9f1c",
+        "red": "#ff5d73",
+        "purple": "#c77dff",
+        "textOnAccent": "#001524"
+      },
+      "planColors": [
+        {
+          "label": "Ember",
+          "value": "#ff7d00"
+        },
+        {
+          "label": "Tide",
+          "value": "#15616d"
+        },
+        {
+          "label": "Amber",
+          "value": "#ffb703"
+        },
+        {
+          "label": "Dusk",
+          "value": "#9070c8"
+        },
+        {
+          "label": "Char",
+          "value": "#e05020"
+        },
+        {
+          "label": "Sage",
+          "value": "#6a994e"
+        },
+        {
+          "label": "Sand",
+          "value": "#ffecd1"
+        },
+        {
+          "label": "Coral",
+          "value": "#ff8fab"
+        },
+        {
+          "label": "Wave",
+          "value": "#49b6ff"
+        },
+        {
+          "label": "Drift",
+          "value": "#b8b8d1"
+        }
+      ]
+    },
+    {
+      "id": "noir-bloom",
+      "name": "Noir Bloom",
+      "isDark": true,
+      "colors": {
+        "bg": "#0e0620",
+        "surface": "#180d38",
+        "faint": "#130a2c",
+        "border": "#2e1060",
+        "text": "#f5eaff",
+        "muted": "#a080cc",
+        "accent": "#ff499e",
+        "dim": "#e563aa",
+        "blue": "#779be7",
+        "orange": "#fb8500",
+        "red": "#ff2060",
+        "purple": "#a480cf",
+        "textOnAccent": "#0e0620"
+      },
+      "planColors": [
+        {
+          "label": "Bloom",
+          "value": "#ff499e"
+        },
+        {
+          "label": "Periwinkle",
+          "value": "#779be7"
+        },
+        {
+          "label": "Torch",
+          "value": "#fb8500"
+        },
+        {
+          "label": "Orchid",
+          "value": "#a480cf"
+        },
+        {
+          "label": "Flame",
+          "value": "#ff2060"
+        },
+        {
+          "label": "Jade",
+          "value": "#34d399"
+        },
+        {
+          "label": "Citrine",
+          "value": "#ffc145"
+        },
+        {
+          "label": "Petal",
+          "value": "#d264b6"
+        },
+        {
+          "label": "Azure",
+          "value": "#49b6ff"
+        },
+        {
+          "label": "Mist",
+          "value": "#b8b8d1"
+        }
+      ]
+    },
+    {
+      "id": "dusk-protocol",
+      "name": "Dusk Protocol",
+      "isDark": true,
+      "colors": {
+        "bg": "#1b1f2a",
+        "surface": "#242b3a",
+        "faint": "#212737",
+        "border": "#3a435a",
+        "text": "#e5e9f0",
+        "muted": "#a7b0c0",
+        "accent": "#88c0d0",
+        "dim": "#5e81ac",
+        "blue": "#81a1c1",
+        "orange": "#d08770",
+        "red": "#bf616a",
+        "purple": "#b48ead",
+        "textOnAccent": "#12122a"
+      },
+      "planColors": [
+        {
+          "label": "Dusk Gold",
+          "value": "#ffc145"
+        },
+        {
+          "label": "Protocol",
+          "value": "#5b9cf6"
+        },
+        {
+          "label": "Ember",
+          "value": "#ff9640"
+        },
+        {
+          "label": "Indigo",
+          "value": "#8878cc"
+        },
+        {
+          "label": "Signal",
+          "value": "#ff6b6c"
+        },
+        {
+          "label": "Matrix",
+          "value": "#34d399"
+        },
+        {
+          "label": "Terminal",
+          "value": "#ffbe0b"
+        },
+        {
+          "label": "Static",
+          "value": "#ff85a1"
+        },
+        {
+          "label": "Sync",
+          "value": "#22d3ee"
+        },
+        {
+          "label": "Slate",
+          "value": "#b8b8d1"
+        }
+      ]
+    },
+    {
+      "id": "pillow-fort",
+      "name": "Pillow Fort",
+      "isDark": true,
+      "colors": {
+        "bg": "#241529",
+        "surface": "#2e1d34",
+        "faint": "#29192f",
+        "border": "#4b3155",
+        "text": "#fdebf6",
+        "muted": "#c7a9c4",
+        "accent": "#f4a6cf",
+        "dim": "#df7fb7",
+        "blue": "#8ecae6",
+        "orange": "#f6bd60",
+        "red": "#e76f89",
+        "purple": "#b392f0",
+        "textOnAccent": "#1c0d38"
+      },
+      "planColors": [
+        {
+          "label": "Dream",
+          "value": "#bdb2ff"
+        },
+        {
+          "label": "Cloud",
+          "value": "#a0c4ff"
+        },
+        {
+          "label": "Peach",
+          "value": "#ffd6a5"
+        },
+        {
+          "label": "Lilac",
+          "value": "#ffc6ff"
+        },
+        {
+          "label": "Blush",
+          "value": "#ffadad"
+        },
+        {
+          "label": "Mint",
+          "value": "#caffbf"
+        },
+        {
+          "label": "Butter",
+          "value": "#fdffb6"
+        },
+        {
+          "label": "Cotton",
+          "value": "#ffcfe6"
+        },
+        {
+          "label": "Ice",
+          "value": "#9bf6ff"
+        },
+        {
+          "label": "Marshmallow",
+          "value": "#e8e4ff"
+        }
+      ]
+    },
+    {
+      "id": "coastal-day",
+      "name": "Coastal Day",
+      "isDark": false,
+      "colors": {
+        "bg": "#f6f8fa",
+        "surface": "#ffffff",
+        "faint": "#f0f3f6",
+        "border": "#d0d7de",
+        "text": "#24292f",
+        "muted": "#57606a",
+        "accent": "#0969da",
+        "dim": "#0550ae",
+        "blue": "#218bff",
+        "orange": "#bc4c00",
+        "red": "#cf222e",
+        "purple": "#8250df",
+        "textOnAccent": "#ffffff"
+      },
+      "planColors": [
+        {
+          "label": "Navy",
+          "value": "#023047"
+        },
+        {
+          "label": "Ocean",
+          "value": "#0e7490"
+        },
+        {
+          "label": "Rust",
+          "value": "#9a3800"
+        },
+        {
+          "label": "Dusk",
+          "value": "#4a2890"
+        },
+        {
+          "label": "Crimson",
+          "value": "#b01828"
+        },
+        {
+          "label": "Moss",
+          "value": "#2a6040"
+        },
+        {
+          "label": "Amber",
+          "value": "#7a5000"
+        },
+        {
+          "label": "Berry",
+          "value": "#842050"
+        },
+        {
+          "label": "Lagoon",
+          "value": "#006880"
+        },
+        {
+          "label": "Slate",
+          "value": "#4a5568"
+        }
+      ]
+    },
+    {
+      "id": "fernwood",
+      "name": "Fernwood",
+      "isDark": false,
+      "colors": {
+        "bg": "#fdf6e3",
+        "surface": "#fffbf1",
+        "faint": "#f5ecd6",
+        "border": "#d8c8a4",
+        "text": "#3b2f2f",
+        "muted": "#7a6a55",
+        "accent": "#859900",
+        "dim": "#6f8500",
+        "blue": "#268bd2",
+        "orange": "#cb4b16",
+        "red": "#dc322f",
+        "purple": "#6c71c4",
+        "textOnAccent": "#ffffff"
+      },
+      "planColors": [
+        {
+          "label": "Grove",
+          "value": "#2a5828"
+        },
+        {
+          "label": "Indigo",
+          "value": "#1848a0"
+        },
+        {
+          "label": "Rust",
+          "value": "#9a4000"
+        },
+        {
+          "label": "Plum",
+          "value": "#4a2890"
+        },
+        {
+          "label": "Crimson",
+          "value": "#8a1c1c"
+        },
+        {
+          "label": "Fern",
+          "value": "#386641"
+        },
+        {
+          "label": "Bronze",
+          "value": "#6a4800"
+        },
+        {
+          "label": "Rose",
+          "value": "#802048"
+        },
+        {
+          "label": "Teal",
+          "value": "#1a5868"
+        },
+        {
+          "label": "Slate",
+          "value": "#4a5568"
+        }
+      ]
+    },
+    {
+      "id": "dust-and-flame",
+      "name": "Dust & Flame",
+      "isDark": false,
+      "colors": {
+        "bg": "#fff7ed",
+        "surface": "#fffcf7",
+        "faint": "#fff1de",
+        "border": "#f2d3a8",
+        "text": "#3d2415",
+        "muted": "#8a5a3b",
+        "accent": "#f97316",
+        "dim": "#c2410c",
+        "blue": "#0369a1",
+        "orange": "#f97316",
+        "red": "#dc2626",
+        "purple": "#7c3aed",
+        "textOnAccent": "#ffffff"
+      },
+      "planColors": [
+        {
+          "label": "Flame",
+          "value": "#a04600"
+        },
+        {
+          "label": "Midnight",
+          "value": "#003049"
+        },
+        {
+          "label": "Smoke",
+          "value": "#9a3800"
+        },
+        {
+          "label": "Canyon",
+          "value": "#5a2080"
+        },
+        {
+          "label": "Ember",
+          "value": "#a01818"
+        },
+        {
+          "label": "Sage",
+          "value": "#2a6040"
+        },
+        {
+          "label": "Desert",
+          "value": "#785000"
+        },
+        {
+          "label": "Dusk",
+          "value": "#882050"
+        },
+        {
+          "label": "Mesa",
+          "value": "#1a5870"
+        },
+        {
+          "label": "Slate",
+          "value": "#4a5568"
+        }
+      ]
+    },
+    {
+      "id": "confetti-studio",
+      "name": "Confetti Studio",
+      "isDark": false,
+      "colors": {
+        "bg": "#faf7ff",
+        "surface": "#ffffff",
+        "faint": "#f2edff",
+        "border": "#ddd1ff",
+        "text": "#2d1b42",
+        "muted": "#6b5a8e",
+        "accent": "#7c3aed",
+        "dim": "#6d28d9",
+        "blue": "#2563eb",
+        "orange": "#ea580c",
+        "red": "#db2777",
+        "purple": "#7c3aed",
+        "textOnAccent": "#ffffff"
+      },
+      "planColors": [
+        {
+          "label": "Punch",
+          "value": "#aa2078"
+        },
+        {
+          "label": "Cobalt",
+          "value": "#1840a0"
+        },
+        {
+          "label": "Sunset",
+          "value": "#9a4000"
+        },
+        {
+          "label": "Grape",
+          "value": "#5030a0"
+        },
+        {
+          "label": "Cherry",
+          "value": "#a01028"
+        },
+        {
+          "label": "Garden",
+          "value": "#226840"
+        },
+        {
+          "label": "Marigold",
+          "value": "#7a5000"
+        },
+        {
+          "label": "Rouge",
+          "value": "#902060"
+        },
+        {
+          "label": "Sapphire",
+          "value": "#005888"
+        },
+        {
+          "label": "Slate",
+          "value": "#4a5568"
+        }
+      ]
+    },
+    {
+      "id": "party",
+      "name": "Party",
+      "isDark": true,
+      "colors": {
+        "bg": "#07090C",
+        "surface": "#0D1117",
+        "faint": "#0A0E14",
+        "border": "#1B2535",
+        "text": "#DDE3EE",
+        "muted": "#8396AB",
+        "accent": "#C9F53A",
+        "dim": "#8CB025",
+        "blue": "#5B9CF6",
+        "orange": "#F97316",
+        "red": "#F87171",
+        "purple": "#C084FC",
+        "textOnAccent": "#07090C"
+      },
+      "planColors": [
+        {
+          "label": "Chartreuse",
+          "value": "#C9F53A"
+        },
+        {
+          "label": "Sky",
+          "value": "#5B9CF6"
+        },
+        {
+          "label": "Tangerine",
+          "value": "#F97316"
+        },
+        {
+          "label": "Lavender",
+          "value": "#C084FC"
+        },
+        {
+          "label": "Coral",
+          "value": "#F87171"
+        },
+        {
+          "label": "Mint",
+          "value": "#34D399"
+        },
+        {
+          "label": "Gold",
+          "value": "#FBBF24"
+        },
+        {
+          "label": "Rose",
+          "value": "#FB7185"
+        },
+        {
+          "label": "Cyan",
+          "value": "#22D3EE"
+        },
+        {
+          "label": "Slate",
+          "value": "#94A3B8"
+        }
+      ]
+    },
+    {
+      "id": "party-light",
+      "name": "Party",
+      "isDark": false,
+      "colors": {
+        "bg": "#f6f8fa",
+        "surface": "#ffffff",
+        "faint": "#f0f3f6",
+        "border": "#d0d7de",
+        "text": "#24292f",
+        "muted": "#57606a",
+        "accent": "#0969da",
+        "dim": "#0550ae",
+        "blue": "#218bff",
+        "orange": "#bc4c00",
+        "red": "#cf222e",
+        "purple": "#8250df",
+        "textOnAccent": "#ffffff"
+      },
+      "planColors": [
+        {
+          "label": "Navy",
+          "value": "#023047"
+        },
+        {
+          "label": "Ocean",
+          "value": "#0e7490"
+        },
+        {
+          "label": "Rust",
+          "value": "#9a3800"
+        },
+        {
+          "label": "Dusk",
+          "value": "#4a2890"
+        },
+        {
+          "label": "Crimson",
+          "value": "#b01828"
+        },
+        {
+          "label": "Moss",
+          "value": "#2a6040"
+        },
+        {
+          "label": "Amber",
+          "value": "#7a5000"
+        },
+        {
+          "label": "Berry",
+          "value": "#842050"
+        },
+        {
+          "label": "Lagoon",
+          "value": "#006880"
+        },
+        {
+          "label": "Slate",
+          "value": "#4a5568"
+        }
+      ]
+    }
+  ]
+}

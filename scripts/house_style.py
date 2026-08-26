@@ -29,7 +29,7 @@ from pathlib import Path
 # Em-dash (U+2014) and en-dash (U+2013). Built at runtime to keep this source
 # ASCII. Checked in every text surface.
 DASHES = (chr(0x2014), chr(0x2013))
-DASH_SUFFIXES = (".md", ".py", ".sql", ".ts", ".tsx", ".yml", ".yaml")
+DASH_SUFFIXES = (".md", ".py", ".sql", ".ts", ".tsx", ".jsx", ".yml", ".yaml")
 
 # Banned vocabulary, checked in Markdown prose only. Code may legitimately use
 # some of these words as identifiers. Kept in sync with .github/workflows/ci.yml.
@@ -43,6 +43,12 @@ BANNED = (
 BANNED_SUFFIXES = (".md",)
 
 BANNED_RE = re.compile(r"\b(" + "|".join(BANNED) + r")\b", re.IGNORECASE)
+
+# Files that state the vocabulary rule have to name the words they ban, so they
+# are exempt from the vocabulary check. This is the same self-reference problem
+# the dash characters above solve with chr(). The dash check still applies to
+# them: quoting a banned word is necessary, writing a dash never is.
+BANNED_EXEMPT = frozenset({Path("mcp_server/style/CONTRACT.md")})
 
 
 def tracked_files() -> list[Path]:
@@ -68,7 +74,7 @@ def main() -> None:
         for n, line in enumerate(lines, start=1):
             if path.suffix in DASH_SUFFIXES and any(d in line for d in DASHES):
                 findings.append(f"{path}:{n}: em-dash or en-dash")
-            if path.suffix in BANNED_SUFFIXES:
+            if path.suffix in BANNED_SUFFIXES and path not in BANNED_EXEMPT:
                 match = BANNED_RE.search(line)
                 if match:
                     findings.append(f"{path}:{n}: banned word '{match.group(1)}'")
