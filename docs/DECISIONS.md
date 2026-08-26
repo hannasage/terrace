@@ -7,6 +7,38 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-014 (2026-08-25): A private, authenticated remote MCP endpoint for multi-device access
+
+**Decision.** The Terrace MCP server is additionally hosted as a small public
+HTTPS endpoint, gated by a bearer token, and registered as a custom connector so
+Claude can reach it from any device, the mobile app included. The local stdio
+server for Claude Desktop and Claude Code is unchanged and stays the default; the
+hosted instance is an additional deployment of the same code, serving the same
+verified data.
+
+**Evidence.** The Desktop tools already produce verified answers with a rendered
+chart. Bringing that to mobile is a reach problem, not a visualisation one: Claude
+connects to a remote MCP server from Anthropic's cloud, not from the device, so a
+device-reachable server must be a public HTTPS endpoint. Verified against the
+Anthropic connector docs, August 2026: custom remote-MCP connectors work on the
+mobile app on the Max plan, and the server must be reachable from Anthropic's IP
+ranges. The `mcp` SDK already serves HTTP and carries first-class bearer and OAuth
+auth, so no new dependency is needed. The endpoint is authenticated and reachable
+only with Hanna's token, and every tool is read-only over already-public Premier
+League facts, so it is personal use consistent with D-003, not the public data
+service operating principle 3 forbids.
+
+**Supersedes.** The absolute "no hosting" reading of D-013. D-013's substance
+holds: no hosted web product, no DuckDB-WASM, no share links, and the local Claude
+apps stay the primary interface. What changes is that the tool layer may also be
+reached remotely, privately, so it is not confined to one machine.
+
+**Rules out.** An unauthenticated or public endpoint, any write tool, and hosting
+the web product that D-013 dropped. The remote server exposes only the read-only
+query tools, behind a token.
+
+---
+
 ## D-013 (2026-08-25): The interface is Claude apps over local MCP tools, not a hosted site
 
 **Decision.** Terrace drops the hosted web product and delivers its interface

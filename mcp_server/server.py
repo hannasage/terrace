@@ -14,15 +14,40 @@ See mcp_server/README.md for the Claude Desktop and Claude Code configuration.
 from __future__ import annotations
 
 import sys
+import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from mcp.server.auth.settings import AuthSettings  # noqa: E402
 from mcp.server.mcpserver import MCPServer  # noqa: E402
 
 import terrace_tools as tools  # noqa: E402
+from auth import StaticTokenVerifier  # noqa: E402
 
-server = MCPServer("terrace")
+# Transport is stdio by default, which is what Claude Desktop and Claude Code
+# launch as a private subprocess, no auth needed. Set TERRACE_TRANSPORT to
+# streamable-http to serve a public HTTPS endpoint for a custom connector, which
+# requires a bearer secret and the server's own public URL.
+TRANSPORT = os.environ.get("TERRACE_TRANSPORT", "stdio")
+HTTP_HOST = os.environ.get("TERRACE_HTTP_HOST", "0.0.0.0")
+HTTP_PORT = int(os.environ.get("TERRACE_HTTP_PORT", "8000"))
+
+if TRANSPORT == "streamable-http":
+    public_url = os.environ.get(
+        "TERRACE_PUBLIC_URL", f"http://localhost:{HTTP_PORT}"
+    )
+    server = MCPServer(
+        "terrace",
+        auth=AuthSettings(
+            issuer_url=public_url,
+            resource_server_url=public_url,
+            required_scopes=["terrace:read"],
+        ),
+        token_verifier=StaticTokenVerifier(os.environ.get("TERRACE_MCP_TOKEN", "")),
+    )
+else:
+    server = MCPServer("terrace")
 
 
 @server.tool()
@@ -79,4 +104,7 @@ def compare(
 
 
 if __name__ == "__main__":
-    server.run(transport="stdio")
+    if TRANSPORT == "streamable-http":
+        server.run(transport="streamable-http", host=HTTP_HOST, port=HTTP_PORT)
+    else:
+        server.run(transport="stdio")

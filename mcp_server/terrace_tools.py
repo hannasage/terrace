@@ -16,14 +16,24 @@ agent narrates.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import duckdb
 import yaml
 
+# Data locations. They default to the repo layout, so local Desktop and Code use
+# needs no configuration. A remote host that bundles the data elsewhere overrides
+# them: TERRACE_DATA_DIR points at the directory holding the published Parquet,
+# and TERRACE_METRICS at metrics.yml. This is the only indirection the server
+# needs to run off a different filesystem.
 REPO = Path(__file__).resolve().parents[1]
-PUBLISHED = REPO / "pipeline" / "data" / "published"
-METRICS_YML = REPO / "pipeline" / "registry" / "metrics.yml"
+PUBLISHED = Path(
+    os.environ.get("TERRACE_DATA_DIR", REPO / "pipeline" / "data" / "published")
+)
+METRICS_YML = Path(
+    os.environ.get("TERRACE_METRICS", REPO / "pipeline" / "registry" / "metrics.yml")
+)
 CLUB_SEASON = PUBLISHED / "club_season.parquet"
 CLUBS = PUBLISHED / "clubs.parquet"
 
