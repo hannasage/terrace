@@ -35,6 +35,7 @@ METRICS_YML = Path(
     os.environ.get("TERRACE_METRICS", REPO / "pipeline" / "registry" / "metrics.yml")
 )
 CLUB_SEASON = PUBLISHED / "club_season.parquet"
+CLUB_MATCH = PUBLISHED / "club_match.parquet"
 CLUBS = PUBLISHED / "clubs.parquet"
 
 SOURCES = ["engsoccerdata", "football-data"]
@@ -213,4 +214,168 @@ def compare(
         "clubs": [
             {"club": r["club"], "series": r["series"]} for r in results
         ],
+    }
+
+
+def _match_rows(con: duckdb.DuckDBPyConnection, where: str, args: list) -> list[dict]:
+    """Fixtures from one club's perspective, oldest first."""
+    rows = con.execute(
+        f"""
+        select season_start_year, match_date, club_name, opponent_name,
+               was_home, goals_for, goals_against, goal_margin, result
+        from read_parquet(?)
+        where {where}
+        order by match_date, match_id
+        """,
+        [CLUB_MATCH.as_posix(), *args],
+    ).fetchall()
+    return [
+        {
+            "season": _season_label(r[0]),
+            # Parquet hands the date back as a date or a string depending on the
+            # reader, so normalise rather than assuming one of them.
+            "date": (
+                r[1].isoformat() if hasattr(r[1], "isoformat") else r[1]
+            ),
+            "club": r[2],
+            "opponent": r[3],
+            "venue": "home" if r[4] else "away",
+            "goals_for": r[5],
+            "goals_against": r[6],
+            "score": f"{r[5]}-{r[6]}",
+            "goal_margin": r[7],
+            "result": r[8],
+        }
+        for r in rows
+    ]
+
+
+def _tally(fixtures: list[dict]) -> dict:
+    """Wins, draws, losses and goals from the perspective the fixtures are in."""
+    return {
+        "played": len(fixtures),
+        "won": sum(1 for f in fixtures if f["result"] == "W"),
+        "drawn": sum(1 for f in fixtures if f["result"] == "D"),
+        "lost": sum(1 for f in fixtures if f["result"] == "L"),
+        "goals_for": sum(f["goals_for"] for f in fixtures),
+        "goals_against": sum(f["goals_against"] for f in fixtures),
+    }
+
+
+def head_to_head(
+    club_a: str,
+    club_b: str,
+    season_from: int | None = None,
+    season_to: int | None = None,
+) -> dict:
+    """Every league meeting between two clubs, with the record from both sides.
+
+    Premier League fixtures only. A season either club spent outside the division
+    has no fixtures, and that absence is reported as a gap rather than as a run of
+    goalless draws.
+    """
+    if club_a.strip().lower() == club_b.strip().lower():
+        return {"error": "head_to_head needs two different clubs."}
+
+    con = _connect()
+    a = _resolve_club(con, club_a)
+    b = _resolve_club(con, club_b)
+    if a is None or b is None:
+        unknown = club_a if a is None else club_b
+        con.close()
+        return {"error": f"Unknown club '{unknown}'. Call list_clubs for the set."}
+    a_id, a_name = a
+    b_id, b_name = b
+
+    lo, hi = con.execute(
+        "select min(season_start_year), max(season_start_year) from read_parquet(?)",
+        [CLUB_MATCH.as_posix()],
+    ).fetchone()
+    season_from = season_from or lo
+    season_to = season_to or hi
+
+    fixtures = _match_rows(
+        con,
+        "club_id = ? and opponent_club_id = ? "
+        "and season_start_year between ? and ?",
+        [a_id, b_id, season_from, season_to],
+    )
+    con.close()
+
+    # Seasons in range where the two never met. Either one was outside the
+    # division or the fixture has not been played yet, and the two are different
+    # findings, so the reason says which.
+    played_in = {f["season"] for f in fixtures}
+    gaps = [
+        {
+            "season": _season_label(year),
+            "gap": (
+                "the fixture has not been played yet this season"
+                if year == hi
+                else "the clubs were not both in the Premier League this season"
+            ),
+        }
+        for year in range(season_from, season_to + 1)
+        if _season_label(year) not in played_in
+    ]
+
+    tally = _tally(fixtures)
+    mirrored = {
+        "played": tally["played"],
+        "won": tally["lost"],
+        "drawn": tally["drawn"],
+        "lost": tally["won"],
+        "goals_for": tally["goals_against"],
+        "goals_against": tally["goals_for"],
+    }
+
+    return {
+        "clubs": [a_name, b_name],
+        "seasons": [_season_label(season_from), _season_label(season_to)],
+        "record": {a_name: tally, b_name: mirrored},
+        "fixtures": fixtures,
+        "gaps": gaps,
+        "sources": SOURCES,
+        "note": (
+            "Premier League meetings only. Cup ties and seasons either club spent "
+            "outside the division are not held."
+        ),
+    }
+
+
+def club_matches(club: str, season: int) -> dict:
+    """Every Premier League fixture a club played in one season, oldest first.
+
+    season is the start year, so 2025 is 2025/26. A club that did not play that
+    season comes back with no fixtures and a reason.
+    """
+    con = _connect()
+    resolved = _resolve_club(con, club)
+    if resolved is None:
+        con.close()
+        return {"error": f"Unknown club '{club}'. Call list_clubs for the set."}
+    club_id, club_name = resolved
+
+    fixtures = _match_rows(
+        con,
+        "club_id = ? and season_start_year = ?",
+        [club_id, season],
+    )
+    con.close()
+
+    if not fixtures:
+        return {
+            "club": club_name,
+            "season": _season_label(season),
+            "fixtures": [],
+            "gap": "the club did not play in the Premier League this season",
+            "sources": SOURCES,
+        }
+
+    return {
+        "club": club_name,
+        "season": _season_label(season),
+        "record": _tally(fixtures),
+        "fixtures": fixtures,
+        "sources": SOURCES,
     }

@@ -56,11 +56,16 @@ select
         end as integer
     )                                              as season_start_year,
     -- Dates are day/month/year, four-digit year on most files and two-digit on
-    -- some early ones. try_strptime returns NULL rather than erroring, so a
-    -- stray value never breaks the build; the mart does not depend on the date.
+    -- some early ones. The two-digit form is tried first, and the order matters:
+    -- %Y happily reads '06/11/93' as the year 93 rather than failing, so putting
+    -- it first silently dated 8524 matches to the first century. %y rejects a
+    -- four-digit year outright, so it cannot claim a date that belongs to %Y.
+    -- try_strptime returns NULL rather than erroring, and a NULL or an
+    -- implausible date now fails the build through assert_match_date_sane,
+    -- because mart__club_match orders a season by this column.
     cast(coalesce(
-        try_strptime(date, '%d/%m/%Y'),
-        try_strptime(date, '%d/%m/%y')
+        try_strptime(date, '%d/%m/%y'),
+        try_strptime(date, '%d/%m/%Y')
     ) as date)                                     as match_date,
     hometeam                                       as home_club_name,
     awayteam                                       as away_club_name,

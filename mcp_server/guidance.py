@@ -22,6 +22,46 @@ import os
 
 MODES = ("learning", "exploration", "analytics")
 
+# The presentation rules, repeated on every tool result.
+#
+# The instructions below are the right place for this, but a client is free to
+# ignore an MCP server's instructions, and one did: the first hosted test came
+# back as verbose inline tables with no artifact and no report_style call, while
+# the tools themselves answered correctly. Tool results are not optional in the
+# same way. The model cannot answer without reading them, so the contract rides
+# along with the data and survives a client that drops the instructions.
+PROSE_RULE = (
+    "Prose is for teaching and guidance only. Do not restate what a table or "
+    "chart already shows, and do not narrate a number the reader can read."
+)
+
+
+def presentation(values: int | None = None) -> dict:
+    """The presentation contract for one tool result.
+
+    values is how many figures the result carries. More than one means the
+    answer is a report and belongs in an artifact; a single figure belongs in
+    chat. None marks a catalogue lookup, which is never itself an answer.
+    """
+    mode = default_mode()
+    block = {
+        "reading_level": mode or "unset: ask the reader once, then hold it",
+        "prose": PROSE_RULE,
+    }
+    if values is None:
+        block["output"] = "chat: this is a catalogue, not an answer"
+        return block
+    if values > 1:
+        block["output"] = "artifact"
+        block["before_rendering"] = (
+            "Call report_style and follow the contract it returns. Build the "
+            "artifact rather than printing tables or charts into the chat."
+        )
+        block["chat_reply"] = "A line or two at most. The report is the artifact."
+    else:
+        block["output"] = "chat: a single figure does not need an artifact"
+    return block
+
 
 def default_mode() -> str | None:
     """The pinned reading level, or None when the agent should ask.

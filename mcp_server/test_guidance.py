@@ -76,6 +76,37 @@ def test_instructions_carry_no_dashes():
     assert chr(0x2013) not in text
 
 
+def test_presentation_requires_an_artifact_for_a_report():
+    """More than one figure is a report. This rides on every tool result because
+    a client may ignore the server instructions, and one did."""
+    p = guidance.presentation(values=12)
+    assert p["output"] == "artifact"
+    assert "report_style" in p["before_rendering"]
+    assert "line or two" in p["chat_reply"]
+
+
+def test_presentation_leaves_a_single_figure_in_chat():
+    p = guidance.presentation(values=1)
+    assert p["output"].startswith("chat")
+    assert "before_rendering" not in p
+
+
+def test_presentation_marks_a_catalogue_as_not_an_answer():
+    p = guidance.presentation(None)
+    assert p["output"].startswith("chat")
+    assert "catalogue" in p["output"]
+
+
+def test_presentation_carries_the_prose_rule_and_mode(monkeypatch):
+    assert "restate" in guidance.presentation(values=3)["prose"]
+    monkeypatch.setenv("TERRACE_DEFAULT_MODE", "analytics")
+    assert guidance.presentation(values=3)["reading_level"] == "analytics"
+
+
+def test_presentation_says_to_ask_when_no_mode_is_pinned():
+    assert "ask" in guidance.presentation(values=3)["reading_level"]
+
+
 def test_instructions_stay_short():
     # They are sent on every conversation. Growth here is a cost on every turn,
     # which is why the long format contract lives behind report_style instead.

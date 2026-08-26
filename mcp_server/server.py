@@ -23,7 +23,30 @@ from mcp.server.mcpserver import MCPServer  # noqa: E402
 
 import style_tools as style  # noqa: E402
 import terrace_tools as tools  # noqa: E402
-from guidance import MODES, build_instructions  # noqa: E402
+from guidance import MODES, build_instructions, presentation  # noqa: E402
+
+
+def _answer(result: dict, values: int) -> dict:
+    """A data answer, with the presentation contract attached.
+
+    The contract rides on the result because a client may ignore the server's
+    instructions, and one did. It is added here rather than in terrace_tools so
+    the query functions stay pure data, which is what makes them testable
+    without any of this.
+    """
+    if "error" in result:
+        return result
+    return {**result, "presentation": presentation(values)}
+
+
+def _catalogue(result: dict) -> dict:
+    """A lookup the agent uses to build an answer, never an answer itself."""
+    return {**result, "presentation": presentation(None)}
+
+
+def _values_in_series(result: dict) -> int:
+    """How many real figures a metric series carries, gaps excluded."""
+    return sum(1 for s in result.get("series", []) if s.get("value") is not None)
 
 # Transport is stdio by default, which is what Claude Desktop and Claude Code
 # launch as a private subprocess. Set TERRACE_TRANSPORT to streamable-http to
@@ -54,14 +77,17 @@ def list_metrics() -> dict:
     constructed, never as a measurement, and mention its definition when it
     matters. Call this before answering so the metric ids and their availability
     are known.
+
+    These are club-season metrics. For a fixture level question, who beat whom
+    and when, use head_to_head or club_matches instead.
     """
-    return tools.list_metrics()
+    return _catalogue(tools.list_metrics())
 
 
 @server.tool()
 def list_clubs() -> dict:
     """List every canonical Premier League club Terrace holds, with ids."""
-    return tools.list_clubs()
+    return _catalogue(tools.list_clubs())
 
 
 @server.tool()
@@ -78,8 +104,13 @@ def get_metric(
     example 2015 for 2015/16; omit them for the full history. A season the club
     did not play, or a season before the metric exists, comes back with a null
     value and a gap reason. Present the gaps as gaps; never fill them with zero.
+
+    A range covering more than one season is a report: build it as an artifact,
+    calling report_style first. A single season is a single figure and belongs
+    in chat.
     """
-    return tools.get_metric(club, metric, season_from, season_to)
+    result = tools.get_metric(club, metric, season_from, season_to)
+    return _answer(result, _values_in_series(result))
 
 
 @server.tool()
@@ -95,8 +126,50 @@ def compare(
     game rather than total points when the range crosses the 42-match seasons
     before 1995/96, or includes the in-progress current season, so the comparison
     is fair.
+
+    A comparison is always a report. Build it as an artifact, calling
+    report_style first, rather than printing tables or charts into the chat.
     """
-    return tools.compare(clubs, metric, season_from, season_to)
+    result = tools.compare(clubs, metric, season_from, season_to)
+    values = sum(_values_in_series(c) for c in result.get("clubs", []))
+    return _answer(result, values)
+
+
+@server.tool()
+def head_to_head(
+    club_a: str,
+    club_b: str,
+    season_from: int | None = None,
+    season_to: int | None = None,
+) -> dict:
+    """Every Premier League meeting between two clubs, with both clubs' records.
+
+    This is the fixture level view: individual results, scores, venue, and the
+    win-draw-loss record from each side. Use it for any "who beats whom" or
+    "head to head" question. The club-season metrics cannot answer those, since
+    they hold how a season ended rather than who won a given match.
+
+    Omit the seasons for the full history. Seasons the two never met come back in
+    gaps, saying whether a club was outside the division or the fixture is still
+    to be played. Cup ties are not held, only league meetings.
+
+    A head to head is a report. Build it as an artifact, calling report_style
+    first.
+    """
+    result = tools.head_to_head(club_a, club_b, season_from, season_to)
+    return _answer(result, len(result.get("fixtures", [])))
+
+
+@server.tool()
+def club_matches(club: str, season: int) -> dict:
+    """Every Premier League fixture one club played in one season, oldest first.
+
+    season is the start year, so 2025 means 2025/26. Returns each result with its
+    date, opponent, venue and score, plus the season record. A club that did not
+    play that season comes back with no fixtures and the reason.
+    """
+    result = tools.club_matches(club, season)
+    return _answer(result, len(result.get("fixtures", [])))
 
 
 @server.tool()
