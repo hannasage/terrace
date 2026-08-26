@@ -14,9 +14,16 @@ interface, in place of a hosted site (see `docs/DECISIONS.md` D-013).
   across a season range.
 - `compare(clubs, metric, season_from?, season_to?)` : one metric across two or
   more clubs, aligned by season.
+- `head_to_head(club_a, club_b, season_from?, season_to?)` : every league meeting
+  between two clubs, with each club's record. The fixture level view.
+- `club_matches(club, season)` : one club's fixtures in one season, oldest first.
 - `report_style(theme?)` : the house report format, a JSX skeleton to copy, and
   the resolved theme tokens. Called before building a report artifact.
 - `list_themes()` : every report theme with its core colours and contrast facts.
+
+The metrics are club-season grain, so they hold how a season ended rather than
+who won a given match. `head_to_head` and `club_matches` read the match grain and
+are what answer a "who beats whom" question.
 
 The tools are registry-driven: a metric exists because it is in
 `pipeline/registry/metrics.yml`, never because a tool names it. A season a club
@@ -51,6 +58,11 @@ conversation. An unrecognised value stops the server rather than being ignored.
 the reading level. It never restates what a chart already shows and never narrates
 a number you can read. In `analytics` the report is the artifact and the chat
 reply is a line or two.
+
+Because a client is free to ignore an MCP server's instructions, and one did on
+the first hosted test, the same contract also rides on every tool result as a
+`presentation` block and is repeated in the tool descriptions. Those two channels
+are not optional: the model cannot answer without reading them.
 
 **Reports.** Anything beyond a single figure goes in an artifact. `report_style`
 returns the format contract from `style/CONTRACT.md`, the skeleton from

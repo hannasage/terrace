@@ -67,6 +67,31 @@ ARTEFACTS = {
         join stg_registry__clubs c using (club_id)
         order by m.season_start_year, m.club_id
     """,
+    # One row per club per match, both perspectives of every fixture. This is
+    # what makes a head-to-head answerable: the club-season grain cannot say who
+    # beat whom, only how a season ended. Both club names travel with the row so
+    # a report reads without a second lookup, same as club_season.
+    "club_match.parquet": """
+        select
+            m.season_start_year,
+            m.match_id,
+            m.match_date,
+            m.club_id,
+            c.club_name,
+            m.opponent_club_id,
+            o.club_name as opponent_name,
+            m.was_home,
+            m.goals_for,
+            m.goals_against,
+            m.goal_margin,
+            m.result,
+            m.clean_sheet,
+            m.match_number
+        from mart__club_match m
+        join stg_registry__clubs c on c.club_id = m.club_id
+        join stg_registry__clubs o on o.club_id = m.opponent_club_id
+        order by m.season_start_year, m.match_date, m.match_id, m.club_id
+    """,
     "clubs.parquet": """
         select club_id, club_name, nation
         from stg_registry__clubs

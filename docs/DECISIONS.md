@@ -7,6 +7,55 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-018 (2026-08-26): The presentation contract rides on tool results, and the match grain is queryable
+
+**Decision.** Three changes, all prompted by the first real question asked of the
+hosted server.
+
+The presentation contract is repeated on every tool result as a `presentation`
+block, and in the tool descriptions. Server instructions stay, but they are no
+longer the only channel. The block names the reading level, the prose rule, and
+whether the answer belongs in an artifact or in chat, decided by how many figures
+the result carries: more than one is a report, a single figure is not.
+
+`mart__club_match` is published as `club_match.parquet` and exposed through two
+tools, `head_to_head` and `club_matches`. Fixture level questions are answerable.
+
+football-data dates are parsed with the two-digit format first, and
+`assert_match_date_sane` replaces `assert_match_date_present`, checking that a
+date could belong to its season rather than only that it exists.
+
+**Evidence.** The test asked for a Villa against Arsenal head-to-head. Three
+instruction-driven behaviours failed together, no artifact, no `report_style`
+call, and verbose prose, while the tools answered correctly and the endpoint
+returned 200 throughout. The deployed image was verified to hold the new code and
+to serve the full instructions in its `initialize` result, so the guidance
+reached the client and the client did not act on it. MCP instructions are
+advisory. Tool results are not: the model cannot answer without reading them.
+
+The same test surfaced two real gaps. The refusal on head-to-head was correct,
+because D-017's work published only the club-season grain, and PR #20 had noted
+the match-grain tool as deferred. And the fixtures it would have returned carried
+dates in the first century: `try_strptime('06/11/93', '%d/%m/%Y')` reads the year
+as 93 rather than failing, so the four-digit branch of the coalesce claimed every
+two-digit date. 8524 matches across 1993/94 to 2016/17 were affected, and the
+not-null assertion from PR #20 passed them without complaint.
+
+The published metrics were checked against a pre-fix baseline and none moved.
+Within a season the mis-parse was uniform, 93 and 94 ordering the same way as
+1993 and 1994, so `match_number` and therefore `longest_win_streak` were never
+wrong. Manchester City 2017/18 remains 18, Chelsea 2004/05 remains 25 clean
+sheets, Arsenal 2003/04 remains 90 points and first. The fault was in the dates
+as displayed, not in the aggregates derived from their order.
+
+**Rules out.** Relying on MCP server instructions as the only carrier of a rule
+that has to hold. Publishing a mart without a tool that reads it, which is what
+made an answerable question unanswerable. Asserting a value is present without
+asserting it is possible: a not-null check on a parsed date is not a check that
+the parse was right.
+
+---
+
 ## D-017 (2026-08-26): The agent's output is shaped by server instructions, and a report is an artifact
 
 **Decision.** How Terrace answers is specified, not left to the model's defaults.
