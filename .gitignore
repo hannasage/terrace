@@ -18,6 +18,9 @@ pipeline/dbt/dbt_packages/
 pipeline/dbt/logs/
 pipeline/dbt/.user.yml
 
+# context sharing w/ CC
+docs/examples
+
 # Registry materialised for dbt, a build artifact from the YAML source of truth
 pipeline/data/registry/
 *.duckdb
