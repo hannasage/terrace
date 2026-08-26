@@ -73,17 +73,21 @@ Claude Code launches the server for the session and can call its tools.
 
 Claude connects to a remote MCP server from Anthropic's cloud, not from your
 device, so to use Terrace from the mobile app the server runs as a small public
-HTTPS endpoint, gated by a bearer token, registered as a custom connector. This is
-recorded in `docs/DECISIONS.md` D-014. The local stdio server above is unchanged
-and stays the default; this is an additional deployment of the same code.
+HTTPS endpoint registered as a custom connector. This is recorded in
+`docs/DECISIONS.md` D-014 and D-015. The local stdio server above is unchanged and
+stays the default; this is an additional deployment of the same code.
 
-The server switches to HTTP when `TERRACE_TRANSPORT=streamable-http`, and then
-requires `Authorization: Bearer <TERRACE_MCP_TOKEN>` on every request. Run it
-locally that way to check the gate:
+Claude's custom-connector flow supports only OAuth or a plain public server, with
+no bearer-token option (see D-015). Terrace advertises no OAuth and is reached as a
+public connector. The gate is the URL path: the server mounts at `/<secret>/mcp`,
+where the secret is `TERRACE_MCP_TOKEN`, so the address is unguessable. That is
+obscurity, not cryptographic auth, and it is acceptable here because the tools are
+read-only over already-public Premier League facts. Run it locally to check:
 
 ```
 TERRACE_TRANSPORT=streamable-http TERRACE_MCP_TOKEN=<secret> \
   uv run python mcp_server/server.py
+# then the endpoint is http://localhost:8000/<secret>/mcp
 ```
 
 ### Deploy to Fly.io
@@ -92,8 +96,7 @@ From the repository root, so the build context includes the bundled data:
 
 ```
 fly launch --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile --no-deploy
-fly secrets set TERRACE_MCP_TOKEN=<a long random string>
-fly secrets set TERRACE_PUBLIC_URL=https://<app-name>.fly.dev
+fly secrets set TERRACE_MCP_TOKEN=<a long random string> --app <app-name>
 fly deploy --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile
 ```
 
@@ -103,18 +106,21 @@ to serve fresher numbers.
 
 ### Register the connector
 
-In Claude settings, add a custom connector pointing at `https://<app-name>.fly.dev/mcp`
-with the bearer token. Terrace's tools then appear on Desktop, web, and the mobile
-app. If the connector flow asks for OAuth rather than a bearer token, the SDK also
-supports a full OAuth provider; swap `StaticTokenVerifier` for it in `auth.py`.
+In Claude settings, add a custom connector pointing at the secret-path URL:
+
+```
+https://<app-name>.fly.dev/<TERRACE_MCP_TOKEN>/mcp
+```
+
+Since the server advertises no OAuth, Claude connects it as a public server, no
+sign-in. Terrace's tools then appear on Desktop, web, and the mobile app.
 
 ### Environment variables
 
 | Variable | Meaning | Default |
 |---|---|---|
 | `TERRACE_TRANSPORT` | `stdio` or `streamable-http` | `stdio` |
-| `TERRACE_MCP_TOKEN` | bearer secret required for HTTP | none (required for HTTP) |
-| `TERRACE_PUBLIC_URL` | the server's own public URL | `http://localhost:<port>` |
+| `TERRACE_MCP_TOKEN` | secret path segment for HTTP: the server mounts at `/<token>/mcp` | none (serves at `/mcp` if unset) |
 | `TERRACE_HTTP_HOST` | bind address for HTTP | `0.0.0.0` |
 | `TERRACE_HTTP_PORT` | port for HTTP | `8000` (`8080` in the image) |
 | `TERRACE_DATA_DIR` | directory holding the published Parquet | the repo's `pipeline/data/published/` |
@@ -126,7 +132,5 @@ supports a full OAuth provider; swap `StaticTokenVerifier` for it in `auth.py`.
   needs to use them honestly, and chooses the transport from the environment.
 - `terrace_tools.py` : the deterministic query functions. Tested by
   `test_terrace_tools.py`, so the logic is verified without the MCP transport.
-- `auth.py` : the bearer-token verifier for the hosted HTTP server. Tested by
-  `test_auth.py`.
 - `Dockerfile`, `fly.toml` : the lean image and Fly.io config for the hosted
   connector.
