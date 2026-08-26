@@ -14,12 +14,76 @@ interface, in place of a hosted site (see `docs/DECISIONS.md` D-013).
   across a season range.
 - `compare(clubs, metric, season_from?, season_to?)` : one metric across two or
   more clubs, aligned by season.
+- `report_style(theme?)` : the house report format, a JSX skeleton to copy, and
+  the resolved theme tokens. Called before building a report artifact.
+- `list_themes()` : every report theme with its core colours and contrast facts.
 
 The tools are registry-driven: a metric exists because it is in
 `pipeline/registry/metrics.yml`, never because a tool names it. A season a club
 did not play, or a season before a metric exists, comes back as an explicit gap,
 never a zero. The tools read the committed Parquet in `pipeline/data/published/`,
 so make sure it is current (`make publish`) after a data change.
+
+## Prompts
+
+- `analysis_mode(mode)` : set the reading level mid conversation.
+- `terrace_report(question)` : answer a question as a full styled report artifact.
+
+## How answers are shaped
+
+The server sends instructions to every client in the MCP initialize result, so
+they apply on Desktop, on the web, and through the hosted connector alike. They
+are built in `guidance.py` and cover three things.
+
+**Reading level.** One of three, resolved before the first substantive answer:
+
+| Mode | Reader | Prose |
+|---|---|---|
+| `learning` | a high school statistics student | defines terms, explains the relationship, says what to look at next |
+| `exploration` | a college statistician in training | assumes the vocabulary, puts the follow up question back to you rather than answering it |
+| `analytics` | a working analyst | answers what was asked and stops |
+
+If you state your level, it is used. Otherwise `TERRACE_DEFAULT_MODE` is used if
+set, and if it is not, the agent asks once and holds the answer for the
+conversation. An unrecognised value stops the server rather than being ignored.
+
+**Prose economy.** Prose is for teaching and guidance, so its budget comes from
+the reading level. It never restates what a chart already shows and never narrates
+a number you can read. In `analytics` the report is the artifact and the chat
+reply is a line or two.
+
+**Reports.** Anything beyond a single figure goes in an artifact. `report_style`
+returns the format contract from `style/CONTRACT.md`, the skeleton from
+`style/template.jsx`, and the theme tokens. Set `TERRACE_STYLE_FILE` to a Markdown
+file of your own to replace the contract; a style defined in your own project
+context wins over the server default in any case.
+
+## Themes
+
+A report ships with two themes, one dark and one light, swapped by a selector in
+the artifact. The defaults are `projection` and `coastal-day`. The rest are opt
+in: name one and it replaces the slot matching its own mode, so asking for a light
+theme keeps the default dark one beside it.
+
+```
+Dark    projection, midnight-reef, neon-arcade, deep-forest,
+        ember-tide, noir-bloom, dusk-protocol, pillow-fort
+Light   coastal-day, fernwood, dust-and-flame, confetti-studio
+```
+
+The palettes are vendored verbatim from `app/lib/projection-themes.ts` in the
+`hannasage/resume` repository, never invented here. Re-vendor them when that file
+changes:
+
+```
+uv run python scripts/vendor_themes.py ../resume/app/lib/projection-themes.ts
+```
+
+`list_themes` reports WCAG contrast per theme, computed rather than eyeballed.
+Text and muted clear the floor everywhere. Accent does not: in `fernwood` and
+`dust-and-flame` it sits below 4.5:1 against its own background, so
+`accent_safe_for_text` is false there and the contract tells the agent to keep
+words out of it and use it for graphics only.
 
 ## Run it
 
@@ -124,6 +188,8 @@ the header, or with a wrong key, is refused with 401.
 | `TERRACE_HTTP_PORT` | port for HTTP | `8000` (`8080` in the image) |
 | `TERRACE_DATA_DIR` | directory holding the published Parquet | the repo's `pipeline/data/published/` |
 | `TERRACE_METRICS` | path to `metrics.yml` | the repo's `pipeline/registry/metrics.yml` |
+| `TERRACE_DEFAULT_MODE` | pinned reading level: `learning`, `exploration` or `analytics` | none (the agent asks once) |
+| `TERRACE_STYLE_FILE` | your own Markdown format contract, replacing the default | none (the built-in contract) |
 
 ## Layout
 
@@ -131,6 +197,12 @@ the header, or with a wrong key, is refused with 401.
   needs to use them honestly, and chooses the transport from the environment.
 - `terrace_tools.py` : the deterministic query functions. Tested by
   `test_terrace_tools.py`, so the logic is verified without the MCP transport.
+- `guidance.py` : the instructions every client receives. Tested by
+  `test_guidance.py`.
+- `style_tools.py` : the format contract, the theme registry and the contrast
+  arithmetic. Tested by `test_style_tools.py`.
+- `style/` : `CONTRACT.md` the house format, `template.jsx` the skeleton to copy,
+  `themes.json` the vendored palettes.
 - `api_key_auth.py` : the pure-ASGI API-key gate for the hosted HTTP server.
   Tested by `test_api_key_auth.py`.
 - `Dockerfile`, `fly.toml` : the lean image and Fly.io config for the hosted

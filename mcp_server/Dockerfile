@@ -20,7 +20,10 @@ RUN pip install --no-cache-dir \
     "duckdb==1.5.5" \
     "pyyaml==6.0.3"
 
-# The server code and the bundled verified data.
+# The server code and the bundled verified data. mcp_server/ carries style/ with
+# the format contract, the JSX skeleton and the vendored themes, which
+# style_tools resolves relative to its own file, so the hosted server serves the
+# same contract as a local one.
 COPY mcp_server/ /app/mcp_server/
 COPY pipeline/data/published/ /app/data/
 COPY pipeline/registry/metrics.yml /app/metrics.yml

@@ -7,6 +7,57 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-017 (2026-08-26): The agent's output is shaped by server instructions, and a report is an artifact
+
+**Decision.** How Terrace answers is specified, not left to the model's defaults.
+Three parts, all delivered through the MCP server.
+
+The server passes `instructions` to `MCPServer`, which the SDK carries in the
+`initialize` result, so the same guidance reaches stdio Desktop and the hosted
+connector. It sets a reading level, one of `learning`, `exploration` or
+`analytics`, resolved in that order from what the reader says, then
+`TERRACE_DEFAULT_MODE`, then a single question asked once per conversation. It
+sets a prose budget: prose is for teaching and guidance, never for restating what
+a chart shows or narrating a number the reader can read. It repeats the honesty
+rules so they survive a style override.
+
+Anything beyond a single figure is an artifact, not chat text. The house format is
+the working paper register from `FORMAT-STANDARD.md`: a single JSX file, hand
+rolled SVG, five panels, inline disclaimers, a numbered bibliography, and a two
+theme switcher. It is returned by a `report_style` tool rather than inlined in the
+instructions, so a conversation that never builds a report never pays for it.
+`TERRACE_STYLE_FILE` replaces the contract with the reader's own.
+
+Themes come from `app/lib/projection-themes.ts` in `hannasage/resume`, vendored
+verbatim by `scripts/vendor_themes.py`. `projection` and `coastal-day` ship; the
+other ten are opt in by name, discoverable through a `list_themes` tool.
+
+**Evidence.** The narration half of D-013 was never specified, so the model
+defaulted to verbose, jargon heavy prose that restated its own charts. The
+mechanisms to fix it were already in the installed SDK and unused. Putting the
+long contract behind a tool keeps the always-sent instructions near 3KB while the
+contract and skeleton, over 34KB together, load only when a report is actually
+being built. Shipping the skeleton as code to copy rather than rules to follow
+matters because the reference paper is 139KB, several times a comfortable single
+artifact write, and its shell, theming and popover engine are mechanical.
+
+Contrast is computed from the vendored palettes rather than asserted. That
+surfaced a real finding: in `fernwood` and `dust-and-flame` the accent sits at
+2.97:1 and 2.64:1 against its own background, below the 4.5:1 text floor. Those
+themes keep their accent as a graphical colour, and the tools report
+`accent_safe_for_text` per theme so the agent does not have to guess.
+
+**Rules out.** Server-side mode storage, and a mode argument on the data tools:
+the hosted server is stateless and shared between Desktop and mobile, and the
+reading level is a narration concern, so it stays conversation state and the tools
+stay data only. Importing `@hannasage/projection-ui` inside an artifact, which the
+sandbox cannot install and which D-007 already records as losing its `--ui-*`
+theming in restricted renderers; the package informs token naming only. Inventing
+a palette when the registry has one. Filling a gap with a zero, a dash, or an
+interpolated point in any generated report.
+
+---
+
 ## D-016 (2026-08-26): The hosted MCP requires an API key in a request header
 
 **Decision.** The hosted MCP server requires an API key on every HTTP request,

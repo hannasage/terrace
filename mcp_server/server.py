@@ -21,7 +21,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from mcp.server.mcpserver import MCPServer  # noqa: E402
 
+import style_tools as style  # noqa: E402
 import terrace_tools as tools  # noqa: E402
+from guidance import MODES, build_instructions  # noqa: E402
 
 # Transport is stdio by default, which is what Claude Desktop and Claude Code
 # launch as a private subprocess. Set TERRACE_TRANSPORT to streamable-http to
@@ -36,7 +38,12 @@ TRANSPORT = os.environ.get("TERRACE_TRANSPORT", "stdio")
 HTTP_HOST = os.environ.get("TERRACE_HTTP_HOST", "0.0.0.0")
 HTTP_PORT = int(os.environ.get("TERRACE_HTTP_PORT", "8000"))
 
-server = MCPServer("terrace")
+# The instructions reach every client through the initialize result, so the
+# reading level handshake and the prose budget apply over stdio and over the
+# hosted connector alike. They are built in guidance.py, kept short there because
+# they are sent on every conversation; the long format contract sits behind the
+# report_style tool instead.
+server = MCPServer("terrace", instructions=build_instructions())
 
 
 @server.tool()
@@ -90,6 +97,59 @@ def compare(
     is fair.
     """
     return tools.compare(clubs, metric, season_from, season_to)
+
+
+@server.tool()
+def report_style(theme: str | None = None) -> dict:
+    """The house format for a Terrace report artifact. Call before building one.
+
+    Returns the format contract, a JSX skeleton to copy rather than compose, and
+    the resolved dark and light theme tokens. Pass theme only when the reader
+    names one from list_themes; it replaces the slot matching its own mode.
+
+    The themes carry computed contrast. Read it before assigning a colour a job:
+    where accent_safe_for_text is false, that theme's accent must not carry
+    words, only graphics.
+    """
+    return style.report_style(theme)
+
+
+@server.tool()
+def list_themes() -> dict:
+    """Every report theme, with its core colours and contrast facts.
+
+    A report ships with two themes, one dark and one light. The rest are opt in.
+    Mention that alternatives exist once, briefly, when you first produce a
+    report, then let the reader raise it.
+    """
+    return style.list_themes()
+
+
+@server.prompt()
+def analysis_mode(mode: str) -> str:
+    """Set the reading level: learning, exploration or analytics."""
+    if mode.strip().lower() not in MODES:
+        return (
+            f"'{mode}' is not a reading level. Ask me for one of: "
+            f"{', '.join(MODES)}."
+        )
+    return (
+        f"Use the {mode.strip().lower()} reading level for the rest of this "
+        "conversation, as the Terrace server instructions define it. Confirm in "
+        "one short line, then wait for my question."
+    )
+
+
+@server.prompt()
+def terrace_report(question: str) -> str:
+    """Answer a question as a full styled report artifact."""
+    return (
+        f"{question}\n\n"
+        "Answer this as a Terrace report artifact. Resolve my reading level "
+        "first if it is not already settled, then call report_style and follow "
+        "the contract it returns. Keep the chat reply to a line or two: the "
+        "report is the artifact, not the message."
+    )
 
 
 if __name__ == "__main__":
