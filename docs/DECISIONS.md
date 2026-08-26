@@ -7,6 +7,36 @@ Format: ID, date, decision, evidence, what it rules out.
 
 ---
 
+## D-016 (2026-08-26): The hosted MCP requires an API key in a request header
+
+**Decision.** The hosted MCP server requires an API key on every HTTP request,
+carried in a header (`Authorization: Bearer <key>` or `X-API-Key: <key>`) and
+checked in constant time against `TERRACE_API_KEY`. A request without a valid key
+is refused with 401. The endpoint is a plain `/mcp`; the connector is registered
+with authentication None and the key supplied through its request-headers field.
+The server is served with `uvicorn.run` rather than the SDK's `run()`.
+
+**Evidence.** The connector's Add dialog exposes a request-headers field for an
+API key, so Claude sends a real credential on every call. That is stronger than
+D-015's unguessable path, which was obscurity carried in the URL, and it is the
+familiar API-key model. A pure-ASGI middleware wraps the SDK's Starlette app to
+enforce it; it must be pure ASGI, not Starlette's BaseHTTPMiddleware, which
+buffers the body and would break the MCP server-sent-event streaming. The 401
+carries no WWW-Authenticate challenge, so Claude does not attempt OAuth. Serving
+with `uvicorn.run` also fixes a shutdown fault: the previous `server.run` path
+called `anyio.run`, which raised a KeyboardInterrupt traceback whenever Fly sent
+SIGINT; uvicorn installs its own signal handlers and exits cleanly.
+
+**Supersedes.** D-015's secret-path mechanism. The intent is unchanged and now met
+properly: the endpoint is private, exposing only read-only query tools, reachable
+only with the key. Removes the secret-path logic and the `TERRACE_MCP_TOKEN` and
+`TERRACE_PUBLIC_URL` variables.
+
+**Rules out.** A gate that lives in the URL rather than a verified credential, and
+running the HTTP server through `server.run` where SIGINT is not handled cleanly.
+
+---
+
 ## D-015 (2026-08-26): The hosted MCP is a public server gated by an unguessable path
 
 **Decision.** The hosted MCP server advertises no OAuth and is reached as a public

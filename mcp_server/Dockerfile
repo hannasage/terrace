@@ -7,8 +7,8 @@
 #
 #   docker build -f mcp_server/Dockerfile -t terrace-mcp .
 #
-# Runs over streamable-http with bearer auth. TERRACE_MCP_TOKEN and
-# TERRACE_PUBLIC_URL are supplied at run time as secrets, never baked in.
+# Runs over streamable-http and requires an API key on every request.
+# TERRACE_API_KEY is supplied at run time as a secret, never baked in.
 
 FROM python:3.12-slim
 
