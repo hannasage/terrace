@@ -20,3 +20,24 @@ models:
       - name: matches_played
         tests:
           - not_null
+
+  - name: mart__club_match
+    description: >
+      Premier League matches at club grain, one row per club per match, the layer
+      between core__match and mart__club_season. Grain uniqueness is checked by
+      tests/assert_club_match_grain.sql.
+    columns:
+      - name: season_start_year
+        tests:
+          - not_null
+      - name: club_id
+        tests:
+          - not_null
+      - name: match_id
+        tests:
+          - not_null
+      - name: result
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['W', 'D', 'L']

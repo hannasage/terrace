@@ -29,10 +29,10 @@ def _value(series: list[dict], season: str):
 
 def test_list_metrics_is_registry_driven():
     ids = {m["id"] for m in tools.list_metrics()["metrics"]}
-    # active metrics are present; a metric still commented out in the registry
-    # (a match-grain one, deferred) is not
-    assert {"points", "points_per_game", "league_position"} <= ids
-    assert "clean_sheets" not in ids
+    # the declared metrics are present; a metric that is not in the registry
+    # (xG needs an Understat adapter we do not have) is not offered
+    assert {"points", "points_per_game", "league_position", "clean_sheets"} <= ids
+    assert "expected_goals" not in ids
 
 
 def test_metric_kind_is_reported():

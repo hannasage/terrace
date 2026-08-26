@@ -3,28 +3,12 @@
 -- here: three points for a win, one for a draw, which the Premier League has
 -- used since its 1992 start.
 --
--- Built by unioning each match twice, once from the home club's perspective and
--- once from the away club's, so every quantity is a straightforward aggregate.
+-- Built by aggregating mart__club_match, the per-club-per-match grain. Metrics
+-- that need individual matches (clean sheets, biggest win margin, win streaks)
+-- come from the same source, so there is one canonical unnest.
 
-with matches as (
-    select * from {{ ref('core__match') }}
-    where competition_id = 'eng_premier_league'
-),
-
-perspectives as (
-    select
-        season_start_year,
-        home_club_id as club_id,
-        home_goals   as goals_for,
-        away_goals   as goals_against
-    from matches
-    union all
-    select
-        season_start_year,
-        away_club_id as club_id,
-        away_goals   as goals_for,
-        home_goals   as goals_against
-    from matches
+with club_match as (
+    select * from {{ ref('mart__club_match') }}
 ),
 
 aggregated as (
@@ -32,16 +16,44 @@ aggregated as (
         season_start_year,
         club_id,
         count(*)                                              as matches_played,
-        sum(case when goals_for > goals_against then 1 else 0 end) as wins,
-        sum(case when goals_for = goals_against then 1 else 0 end) as draws,
-        sum(case when goals_for < goals_against then 1 else 0 end) as losses,
-        sum(goals_for)                                       as goals_for,
-        sum(goals_against)                                   as goals_against,
-        sum(goals_for) - sum(goals_against)                  as goal_difference,
-        3 * sum(case when goals_for > goals_against then 1 else 0 end)
-            + sum(case when goals_for = goals_against then 1 else 0 end) as points
-    from perspectives
+        sum(case when result = 'W' then 1 else 0 end)         as wins,
+        sum(case when result = 'D' then 1 else 0 end)         as draws,
+        sum(case when result = 'L' then 1 else 0 end)         as losses,
+        sum(goals_for)                                        as goals_for,
+        sum(goals_against)                                    as goals_against,
+        sum(goals_for) - sum(goals_against)                   as goal_difference,
+        3 * sum(case when result = 'W' then 1 else 0 end)
+            + sum(case when result = 'D' then 1 else 0 end)   as points,
+        -- Match-derived metrics.
+        sum(case when clean_sheet then 1 else 0 end)          as clean_sheets,
+        max(case when result = 'W' then goal_margin end)      as biggest_win_margin
+    from club_match
     group by season_start_year, club_id
+),
+
+-- Longest run of consecutive wins per club-season, gaps and islands: among a
+-- club's wins in match order, match_number minus the wins' own row number is
+-- constant inside one unbroken run, so grouping on it and counting gives each
+-- run's length.
+win_islands as (
+    select
+        club_id,
+        season_start_year,
+        match_number - row_number() over (
+            partition by club_id, season_start_year order by match_number
+        ) as run_group
+    from club_match
+    where result = 'W'
+),
+
+streaks as (
+    select club_id, season_start_year, max(run_length) as longest_win_streak
+    from (
+        select club_id, season_start_year, run_group, count(*) as run_length
+        from win_islands
+        group by club_id, season_start_year, run_group
+    )
+    group by club_id, season_start_year
 ),
 
 ranked as (
@@ -106,8 +118,16 @@ select
     -- Change versus the club's immediately previous season, when that was the
     -- calendar year before. Null when the club was absent from the league then.
     cur.points - prev.points                             as points_change_vs_prev,
-    cur.goal_difference - prev.goal_difference           as goal_difference_change_vs_prev
+    cur.goal_difference - prev.goal_difference           as goal_difference_change_vs_prev,
+    -- Match-derived metrics. A club that won no match has a null biggest margin
+    -- (an honest gap) and a streak of zero.
+    cur.clean_sheets,
+    cur.biggest_win_margin,
+    coalesce(streaks.longest_win_streak, 0)              as longest_win_streak
 from with_bounds cur
 left join aggregated prev
     on prev.club_id = cur.club_id
    and prev.season_start_year = cur.season_start_year - 1
+left join streaks
+    on streaks.club_id = cur.club_id
+   and streaks.season_start_year = cur.season_start_year
