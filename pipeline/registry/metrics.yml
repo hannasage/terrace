@@ -233,11 +233,38 @@
   precision: 0
 
 # ---------------------------------------------------------------------------
-# Deferred: these need per-match rows, which the club-season mart does not hold.
-# They arrive with a match-grain mart in a follow-up. Uncommenting them now would
-# fail the build, since there is no column to map to yet.
+# Match-derived, computed from the match-grain mart mart__club_match.
 # ---------------------------------------------------------------------------
 
-# - id: longest_win_streak         # most consecutive wins in the season
-# - id: biggest_win_margin         # largest goal margin in a single match
-# - id: clean_sheets               # matches with goals_against = 0
+- id: clean_sheets
+  label: Clean sheets
+  grain: club_season
+  unit: count
+  kind: constructed          # matches with no goal conceded
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/clean_sheets.md
+  higher_is_better: true
+  precision: 0
+
+- id: biggest_win_margin
+  label: Biggest win margin
+  grain: club_season
+  unit: count
+  kind: constructed          # largest goal margin in a won match
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/biggest_win_margin.md
+  higher_is_better: true
+  precision: 0
+
+- id: longest_win_streak
+  label: Longest win streak
+  grain: club_season
+  unit: count
+  kind: constructed          # most consecutive wins in match order
+  available_from: "1992-93"
+  sources: [engsoccerdata, football-data]
+  definition_url: docs/metrics/longest_win_streak.md
+  higher_is_better: true
+  precision: 0

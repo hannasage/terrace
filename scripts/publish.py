@@ -59,7 +59,10 @@ ARTEFACTS = {
             m.is_champion,
             m.relegated,
             m.points_change_vs_prev,
-            m.goal_difference_change_vs_prev
+            m.goal_difference_change_vs_prev,
+            m.clean_sheets,
+            m.biggest_win_margin,
+            m.longest_win_streak
         from mart__club_season m
         join stg_registry__clubs c using (club_id)
         order by m.season_start_year, m.club_id
