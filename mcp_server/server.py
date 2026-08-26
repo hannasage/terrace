@@ -27,19 +27,14 @@ import terrace_tools as tools  # noqa: E402
 # launch as a private subprocess. Set TERRACE_TRANSPORT to streamable-http to
 # serve a public HTTPS endpoint for a custom connector.
 #
-# Claude's custom-connector flow supports only OAuth or a plain public server; it
-# has no bearer-token option, and attempting OAuth against a server that does not
-# fully implement it fails to register. So the hosted server advertises no OAuth
-# and is reached as a public connector. The gate is the path: the server mounts at
-# /<secret>/mcp, built from TERRACE_MCP_TOKEN, so the URL is unguessable. That is
-# obscurity, not cryptographic auth, which is acceptable here because the tools
-# are read-only over already-public Premier League facts. See D-015.
+# Claude's custom-connector flow supports OAuth or a plain endpoint with a
+# credential header, not a native bearer scheme it negotiates. The hosted server
+# advertises no OAuth and requires an API key on every request, supplied through
+# the connector's request-headers field. The key is checked by ApiKeyMiddleware.
+# See docs/DECISIONS.md D-016.
 TRANSPORT = os.environ.get("TERRACE_TRANSPORT", "stdio")
 HTTP_HOST = os.environ.get("TERRACE_HTTP_HOST", "0.0.0.0")
 HTTP_PORT = int(os.environ.get("TERRACE_HTTP_PORT", "8000"))
-
-_secret = os.environ.get("TERRACE_MCP_TOKEN", "").strip("/")
-HTTP_PATH = f"/{_secret}/mcp" if _secret else "/mcp"
 
 server = MCPServer("terrace")
 
@@ -99,11 +94,20 @@ def compare(
 
 if __name__ == "__main__":
     if TRANSPORT == "streamable-http":
-        server.run(
-            transport="streamable-http",
-            host=HTTP_HOST,
-            port=HTTP_PORT,
-            streamable_http_path=HTTP_PATH,
-        )
+        import uvicorn
+
+        from api_key_auth import ApiKeyMiddleware
+
+        api_key = os.environ.get("TERRACE_API_KEY", "")
+        if not api_key:
+            raise SystemExit(
+                "TERRACE_API_KEY must be set to a secret when serving over HTTP."
+            )
+        # Build the same Starlette app run() would, then wrap it with the API-key
+        # gate before uvicorn serves it. transport_security stays at the default
+        # that the plain run() path uses and that works behind the Fly proxy.
+        app = server.streamable_http_app(streamable_http_path="/mcp", host=HTTP_HOST)
+        app.add_middleware(ApiKeyMiddleware, api_key=api_key)
+        uvicorn.run(app, host=HTTP_HOST, port=HTTP_PORT)
     else:
         server.run(transport="stdio")

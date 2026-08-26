@@ -72,22 +72,20 @@ Claude Code launches the server for the session and can call its tools.
 ## Reach it from mobile: a hosted connector
 
 Claude connects to a remote MCP server from Anthropic's cloud, not from your
-device, so to use Terrace from the mobile app the server runs as a small public
-HTTPS endpoint registered as a custom connector. This is recorded in
-`docs/DECISIONS.md` D-014 and D-015. The local stdio server above is unchanged and
-stays the default; this is an additional deployment of the same code.
+device, so to use Terrace from the mobile app the server runs as a small HTTPS
+endpoint registered as a custom connector. This is recorded in `docs/DECISIONS.md`
+D-014 and D-016. The local stdio server above is unchanged and stays the default;
+this is an additional deployment of the same code.
 
-Claude's custom-connector flow supports only OAuth or a plain public server, with
-no bearer-token option (see D-015). Terrace advertises no OAuth and is reached as a
-public connector. The gate is the URL path: the server mounts at `/<secret>/mcp`,
-where the secret is `TERRACE_MCP_TOKEN`, so the address is unguessable. That is
-obscurity, not cryptographic auth, and it is acceptable here because the tools are
-read-only over already-public Premier League facts. Run it locally to check:
+Claude's custom-connector flow supports OAuth or a plain endpoint with a
+credential header. Terrace advertises no OAuth and requires an API key on every
+request: `Authorization: Bearer <key>` (or `X-API-Key: <key>`), checked against
+`TERRACE_API_KEY`. Run it locally to check the gate:
 
 ```
-TERRACE_TRANSPORT=streamable-http TERRACE_MCP_TOKEN=<secret> \
+TERRACE_TRANSPORT=streamable-http TERRACE_API_KEY=<a secret> \
   uv run python mcp_server/server.py
-# then the endpoint is http://localhost:8000/<secret>/mcp
+# the endpoint is http://localhost:8000/mcp; a request without the key gets 401
 ```
 
 ### Deploy to Fly.io
@@ -95,32 +93,33 @@ TERRACE_TRANSPORT=streamable-http TERRACE_MCP_TOKEN=<secret> \
 From the repository root, so the build context includes the bundled data:
 
 ```
-fly launch --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile --no-deploy
-fly secrets set TERRACE_MCP_TOKEN=<a long random string> --app <app-name>
-fly deploy --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile
+fly apps create --generate-name          # or: fly apps create <unique-name>
+fly secrets set TERRACE_API_KEY=<a long random string> -a <app-name>
+fly deploy -a <app-name> --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile
 ```
 
-The image bundles `pipeline/data/published/` and `pipeline/registry/metrics.yml`,
-so the host serves the data as of the last deploy. Redeploy after a data refresh
-to serve fresher numbers.
+Pass `-a <app-name>` explicitly so the deploy always knows the app. The image
+bundles `pipeline/data/published/` and `pipeline/registry/metrics.yml`, so the
+host serves the data as of the last deploy. Redeploy after a data refresh to serve
+fresher numbers.
 
 ### Register the connector
 
-In Claude settings, add a custom connector pointing at the secret-path URL:
+In Claude settings, add a custom connector:
 
-```
-https://<app-name>.fly.dev/<TERRACE_MCP_TOKEN>/mcp
-```
+- URL: `https://<app-name>.fly.dev/mcp`
+- Authentication: None (the server advertises no OAuth)
+- Request header: `Authorization` = `Bearer <your TERRACE_API_KEY>`
 
-Since the server advertises no OAuth, Claude connects it as a public server, no
-sign-in. Terrace's tools then appear on Desktop, web, and the mobile app.
+Terrace's tools then appear on Desktop, web, and the mobile app. A request without
+the header, or with a wrong key, is refused with 401.
 
 ### Environment variables
 
 | Variable | Meaning | Default |
 |---|---|---|
 | `TERRACE_TRANSPORT` | `stdio` or `streamable-http` | `stdio` |
-| `TERRACE_MCP_TOKEN` | secret path segment for HTTP: the server mounts at `/<token>/mcp` | none (serves at `/mcp` if unset) |
+| `TERRACE_API_KEY` | shared secret required on every HTTP request | none (required for HTTP) |
 | `TERRACE_HTTP_HOST` | bind address for HTTP | `0.0.0.0` |
 | `TERRACE_HTTP_PORT` | port for HTTP | `8000` (`8080` in the image) |
 | `TERRACE_DATA_DIR` | directory holding the published Parquet | the repo's `pipeline/data/published/` |
@@ -132,5 +131,7 @@ sign-in. Terrace's tools then appear on Desktop, web, and the mobile app.
   needs to use them honestly, and chooses the transport from the environment.
 - `terrace_tools.py` : the deterministic query functions. Tested by
   `test_terrace_tools.py`, so the logic is verified without the MCP transport.
+- `api_key_auth.py` : the pure-ASGI API-key gate for the hosted HTTP server.
+  Tested by `test_api_key_auth.py`.
 - `Dockerfile`, `fly.toml` : the lean image and Fly.io config for the hosted
   connector.

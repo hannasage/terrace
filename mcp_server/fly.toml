@@ -3,14 +3,14 @@
 # One small always-on machine serving the connector over HTTPS. Deploy from the
 # repository root so the Dockerfile's build context includes the bundled data:
 #
-#   fly deploy --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile
+#   fly deploy -a <app-name> --config mcp_server/fly.toml --dockerfile mcp_server/Dockerfile
 #
-# Set the secrets first, never commit them:
+# Set the API-key secret first, never commit it:
 #
-#   fly secrets set TERRACE_MCP_TOKEN=<a long random string>
-#   fly secrets set TERRACE_PUBLIC_URL=https://<app-name>.fly.dev
+#   fly secrets set TERRACE_API_KEY=<a long random string> -a <app-name>
 #
-# Then register https://<app-name>.fly.dev/mcp as a custom connector in Claude.
+# Then register https://<app-name>.fly.dev/mcp as a custom connector in Claude,
+# with a request header Authorization = Bearer <the same key>.
 
 app = "terrace-mcp"
 primary_region = "iad"
