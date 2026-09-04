@@ -67,16 +67,20 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # Goes through the Makefile so this lane runs exactly what CI runs. Calling
+      # dbt directly here skipped scripts/registry_to_parquet.py, and the registry
+      # Parquet it writes is a gitignored build artefact, so the registry staging
+      # models failed on a fresh runner and publish.py never ran. The pull request
+      # then carried a new snapshot alongside stale artefacts.
       - name: Rebuild
         if: steps.diff.outputs.changed == 'true'
-        run: |
-          uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
-          uv run python scripts/publish.py
-
-      # Continues on failure deliberately. A build that breaks still produces a
-      # pull request, so the diff is reviewable from the GitHub app rather than
-      # buried in a log. CI on the pull request is what blocks the merge.
+        # Continues on failure deliberately. A build that breaks still produces a
+        # pull request, so the diff is reviewable from the GitHub app rather than
+        # buried in a log. CI on the pull request is what blocks the merge.
         continue-on-error: true
+        run: |
+          make build
+          make publish
 
       - name: Open pull request
         if: steps.diff.outputs.changed == 'true'
