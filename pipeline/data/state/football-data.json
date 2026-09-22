@@ -1,5 +1,5 @@
 {
-  "last_changed_run_date": "2026-09-15",
+  "last_changed_run_date": "2026-09-22",
   "seasons": {
     "0001": {
       "content_sha256": "e2a73bae006d9724b5343d3735a61f11d258955477e3d87b68346d017edaf46b",
@@ -132,9 +132,9 @@
       "snapshot": "football-data/2026-08-25/E0_2526.csv.gz"
     },
     "2627": {
-      "content_sha256": "a5bf08a220af79c2ecd2f3e51fa5f9ea6941c812c3a1f9c49b802c92e11bbd1d",
-      "etag": "\"4e24-65b795b00bc56\"",
-      "snapshot": "football-data/2026-09-15/E0_2627.csv.gz"
+      "content_sha256": "8e21d4821be776332f3504f55f85b4277f326f03513b2c7501fbdedf92b8b1a2",
+      "etag": "\"60e3-65c01e3ef7d76\"",
+      "snapshot": "football-data/2026-09-22/E0_2627.csv.gz"
     },
     "9394": {
       "content_sha256": "431f64f3272c82df9a25ba6abffc1c427b25947b6ff15c52b66ad77bb623c804",
